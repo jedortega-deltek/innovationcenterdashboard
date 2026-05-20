@@ -46,7 +46,8 @@ import {
   Sparkles, Rocket, Clock, ListTodo, Zap, AlertCircle, Loader2, User, TrendingUp,
   Bot, FileCode, Workflow, BarChart3, MessageSquare, Wrench, X, Search,
   ArrowUp, ArrowDown, ArrowUpDown, ExternalLink, BookOpen, Lightbulb, Hammer,
-  ChevronDown, ListChecks, Flag, PartyPopper, CheckCircle2, Inbox, HelpCircle
+  ChevronDown, ListChecks, Flag, PartyPopper, CheckCircle2, Inbox, HelpCircle,
+  Layers, Cpu, Cloud, Cog, Database, Boxes, Puzzle, Globe, Code, Brain, Wand2, Gauge
 } from 'lucide-react';
 
 /* ============================================================
@@ -281,16 +282,54 @@ const Dashboard = () => {
     return acc;
   }, {});
 
-  const typeStyles = {
-    Prompt:     { bg: 'bg-violet-100',  text: 'text-violet-800',  ring: 'ring-violet-200',  icon: MessageSquare },
-    Agent:      { bg: 'bg-blue-100',    text: 'text-blue-800',    ring: 'ring-blue-200',    icon: Bot },
-    Automation: { bg: 'bg-emerald-100', text: 'text-emerald-800', ring: 'ring-emerald-200', icon: Workflow },
-    Script:     { bg: 'bg-amber-100',   text: 'text-amber-800',   ring: 'ring-amber-200',   icon: FileCode },
-    Workflow:   { bg: 'bg-teal-100',    text: 'text-teal-800',    ring: 'ring-teal-200',    icon: Workflow },
-    Dashboard:  { bg: 'bg-indigo-100',  text: 'text-indigo-800',  ring: 'ring-indigo-200',  icon: BarChart3 },
-    Other:      { bg: 'bg-slate-100',   text: 'text-slate-800',   ring: 'ring-slate-200',   icon: Wrench },
+  // Canonical mappings — known types get their dedicated color + icon
+  const TYPE_OVERRIDES = {
+    'Prompt':     { bg: 'bg-violet-100',  text: 'text-violet-800',  ring: 'ring-violet-200',  icon: MessageSquare },
+    'Agent':      { bg: 'bg-blue-100',    text: 'text-blue-800',    ring: 'ring-blue-200',    icon: Bot },
+    'Automation': { bg: 'bg-emerald-100', text: 'text-emerald-800', ring: 'ring-emerald-200', icon: Workflow },
+    'Script':     { bg: 'bg-amber-100',   text: 'text-amber-800',   ring: 'ring-amber-200',   icon: FileCode },
+    'Workflow':   { bg: 'bg-teal-100',    text: 'text-teal-800',    ring: 'ring-teal-200',    icon: Workflow },
+    'Dashboard':  { bg: 'bg-indigo-100',  text: 'text-indigo-800',  ring: 'ring-indigo-200',  icon: BarChart3 },
+    'Custom GPT': { bg: 'bg-pink-100',    text: 'text-pink-800',    ring: 'ring-pink-200',    icon: Brain },
+    'Tool':       { bg: 'bg-cyan-100',    text: 'text-cyan-800',    ring: 'ring-cyan-200',    icon: Wand2 },
+    'Integration':{ bg: 'bg-fuchsia-100', text: 'text-fuchsia-800', ring: 'ring-fuchsia-200', icon: Puzzle },
+    'Template':   { bg: 'bg-rose-100',    text: 'text-rose-800',    ring: 'ring-rose-200',    icon: Layers },
+    'API':        { bg: 'bg-orange-100',  text: 'text-orange-800',  ring: 'ring-orange-200',  icon: Code },
+    'Bot':        { bg: 'bg-sky-100',     text: 'text-sky-800',     ring: 'ring-sky-200',     icon: Bot },
+    'Chatbot':    { bg: 'bg-purple-100',  text: 'text-purple-800',  ring: 'ring-purple-200',  icon: MessageSquare },
+    'Knowledge Base': { bg: 'bg-lime-100', text: 'text-lime-800',   ring: 'ring-lime-200',    icon: BookOpen },
+    'Report':     { bg: 'bg-stone-100',   text: 'text-stone-800',   ring: 'ring-stone-200',   icon: Gauge },
   };
-  const getTypeStyle = (t) => typeStyles[t] || typeStyles.Other;
+
+  // Fallback palette for any type not in TYPE_OVERRIDES — deterministic by name
+  const TYPE_PALETTE = [
+    { bg: 'bg-pink-100',    text: 'text-pink-800',    ring: 'ring-pink-200',    icon: Sparkles },
+    { bg: 'bg-rose-100',    text: 'text-rose-800',    ring: 'ring-rose-200',    icon: Cpu },
+    { bg: 'bg-orange-100',  text: 'text-orange-800',  ring: 'ring-orange-200',  icon: Cog },
+    { bg: 'bg-yellow-100',  text: 'text-yellow-800',  ring: 'ring-yellow-200',  icon: Lightbulb },
+    { bg: 'bg-lime-100',    text: 'text-lime-800',    ring: 'ring-lime-200',    icon: Boxes },
+    { bg: 'bg-cyan-100',    text: 'text-cyan-800',    ring: 'ring-cyan-200',    icon: Cloud },
+    { bg: 'bg-sky-100',     text: 'text-sky-800',     ring: 'ring-sky-200',     icon: Globe },
+    { bg: 'bg-purple-100',  text: 'text-purple-800',  ring: 'ring-purple-200',  icon: Brain },
+    { bg: 'bg-fuchsia-100', text: 'text-fuchsia-800', ring: 'ring-fuchsia-200', icon: Database },
+    { bg: 'bg-stone-100',   text: 'text-stone-800',   ring: 'ring-stone-200',   icon: Wrench },
+  ];
+
+  const hashString = (s) => {
+    let h = 0;
+    const str = String(s);
+    for (let i = 0; i < str.length; i++) {
+      h = ((h << 5) - h) + str.charCodeAt(i);
+      h |= 0;
+    }
+    return Math.abs(h);
+  };
+
+  const getTypeStyle = (t) => {
+    if (TYPE_OVERRIDES[t]) return TYPE_OVERRIDES[t];
+    if (!t) return TYPE_PALETTE[0];
+    return TYPE_PALETTE[hashString(t) % TYPE_PALETTE.length];
+  };
 
   const pipelineCount = active.filter((r) => String(r.progress).toLowerCase() === 'not started').length;
   const inProgressCount = active.filter((r) => {
@@ -298,12 +337,17 @@ const Dashboard = () => {
     return p && p !== 'approved' && p !== 'on hold' && p !== 'not started';
   }).length;
 
-  // Unique, sorted list of sprints from the data (newest first by year + sprint number)
+  // Unique, sorted list of sprints from the data (newest first by year + sprint number).
+  // Excludes blanks and "N/A"-style placeholders.
   const availableSprints = Array.from(
     new Set(
       allProjects
         .map((r) => String(r.sprint).trim())
-        .filter((s) => s && s.length > 0)
+        .filter((s) => {
+          if (!s) return false;
+          const v = s.toLowerCase();
+          return v !== 'n/a' && v !== 'na' && v !== 'none' && v !== 'tbd' && v !== '-';
+        })
     )
   ).sort((a, b) => {
     const parseKey = (s) => {
@@ -578,7 +622,7 @@ const Dashboard = () => {
             </div>
           </div>
           {sprintItems.length === 0 ? (
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-center text-sm text-slate-500">No projects assigned to {CURRENT_SPRINT}.</div>
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-center text-sm text-slate-500">No projects assigned to {activeSprintFilter}.</div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
               {sprintItems.map((item, i) => {
