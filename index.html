@@ -8,6 +8,18 @@
 <!-- Tailwind CSS via Play CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
 
+<!-- Tailwind config: safelist colors used dynamically in JS string literals
+     so they always get included in the generated CSS. -->
+<script>
+  tailwind.config = {
+    safelist: [
+      {
+        pattern: /^(bg|text|ring|border|hover:bg|hover:text|hover:border|from|to)-(slate|gray|zinc|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(50|100|200|300|400|500|600|700|800|900)$/
+      }
+    ]
+  };
+</script>
+
 <!-- Custom CSS -->
 <style>
   html, body { margin: 0; background: #f8fafc; }
@@ -59,10 +71,10 @@ import {
    - Any public CSV URL
    ============================================================ */
 const CSV_URLS = {
-  approvedInnovations: './Approved Innovations (4).csv',
-  promptLibrary:       './CLX AI Prompt Library (2).csv',
-  shareYourProject:    './Share your project (11).csv',
-  workItems:           './Work Items (2).csv',
+  approvedInnovations: './Approved Innovations 4.csv',
+  promptLibrary:       './CLX AI Prompt Library 2.csv',
+  shareYourProject:    './Share your project 11.csv',
+  workItems:           './Work Items 2.csv',
 };
 
 // Update this each sprint cycle
@@ -345,8 +357,11 @@ const Dashboard = () => {
         .map((r) => String(r.sprint).trim())
         .filter((s) => {
           if (!s) return false;
-          const v = s.toLowerCase();
-          return v !== 'n/a' && v !== 'na' && v !== 'none' && v !== 'tbd' && v !== '-';
+          // Strip ALL whitespace (including non-breaking spaces) before comparing
+          const stripped = s.replace(/\s+/g, '').toLowerCase();
+          if (!stripped) return false;
+          const skip = ['n/a', 'na', 'n.a.', 'n.a', 'none', 'tbd', 'notapplicable', '-', '—', '--'];
+          return !skip.includes(stripped);
         })
     )
   ).sort((a, b) => {
