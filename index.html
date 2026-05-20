@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CE Innovation Center Dashboard</title>
+
+<!-- Tailwind CSS via Play CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Custom CSS -->
+<style>
+  html, body { margin: 0; background: #f8fafc; }
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>
+
+<!-- Import map for React, lucide-react, PapaParse via ESM CDN -->
+<script type="importmap">
+{
+  "imports": {
+    "react":              "https://esm.sh/react@18.3.1",
+    "react/jsx-runtime":  "https://esm.sh/react@18.3.1/jsx-runtime",
+    "react-dom/client":   "https://esm.sh/react-dom@18.3.1/client",
+    "lucide-react":       "https://esm.sh/lucide-react@0.383.0?deps=react@18.3.1",
+    "papaparse":          "https://esm.sh/papaparse@5.4.1"
+  }
+}
+</script>
+
+<!-- Babel for in-browser JSX transpilation -->
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" data-type="module" data-presets="react">
+import React, { useState, useEffect } from 'react';
+import { createRoot } from 'react-dom/client';
+import Papa from 'papaparse';
+import {
+  Sparkles, Rocket, Clock, ListTodo, Zap, AlertCircle, Loader2, User, TrendingUp,
+  Bot, FileCode, Workflow, BarChart3, MessageSquare, Wrench, X, Search,
+  ArrowUp, ArrowDown, ArrowUpDown, ExternalLink, BookOpen, Lightbulb, Hammer,
+  ChevronDown, ListChecks, Flag, PartyPopper, CheckCircle2, Inbox, HelpCircle
+} from 'lucide-react';
+
+/* ============================================================
+   CONFIGURATION — REPLACE THESE WITH YOUR ACTUAL CSV URLs
+   ============================================================
+   You can use:
+   - Raw GitHub URLs: https://raw.githubusercontent.com/USER/REPO/main/data/file.csv
+   - Relative paths if the CSVs sit alongside this file: ./data/file.csv
+   - Any public CSV URL
+   ============================================================ */
+const CSV_URLS = {
+  approvedInnovations: 'YOUR_APPROVED_INNOVATIONS_CSV_URL_HERE',
+  promptLibrary:       'YOUR_PROMPT_LIBRARY_CSV_URL_HERE',
+  shareYourProject:    'YOUR_SHARE_YOUR_PROJECT_CSV_URL_HERE',
+  workItems:           'YOUR_WORK_ITEMS_CSV_URL_HERE',
+};
+
+// Update this each sprint cycle
+const CURRENT_SPRINT = '2026 S4 (May 5 - May 26)';
+/* ============================================================ */
+
+const Dashboard = () => {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [approved, setApproved] = useState([]);
+  const [prompts, setPrompts] = useState([]);
+  const [active, setActive] = useState([]);
+  const [allProjects, setAllProjects] = useState([]);
+  const [workItems, setWorkItems] = useState([]);
+  const [selectedType, setSelectedType] = useState(null);
+  const [selectedKpi, setSelectedKpi] = useState(null);
+  const [selectedSprint, setSelectedSprint] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortConfig, setSortConfig] = useState({ key: 'percent', direction: 'desc' });
+  const [navOpen, setNavOpen] = useState(false);
+
+  // ---------- Helpers ----------
+  const cleanValue = (v) => {
+    if (v === null || v === undefined || v === '') return '';
+    if (typeof v === 'number' || typeof v === 'boolean') return v;
+    if (Array.isArray(v)) return v.map(cleanValue).filter(Boolean).join(', ');
+    if (typeof v === 'object') {
+      if (v.Value !== undefined) return cleanValue(v.Value);
+      if (v.DisplayName !== undefined) return cleanValue(v.DisplayName);
+      if (v.results && Array.isArray(v.results)) return v.results.map(cleanValue).filter(Boolean).join(', ');
+      return '';
+    }
+    const s = String(v).trim();
+    if ((s.startsWith('{') && s.endsWith('}')) || (s.startsWith('[') && s.endsWith(']'))) {
+      try {
+        const parsed = JSON.parse(s);
+        return cleanValue(parsed);
+      } catch (e) {
+        const valMatch = s.match(/"Value"\s*:\s*"([^"]+)"/);
+        if (valMatch) return valMatch[1];
+        const nameMatch = s.match(/"DisplayName"\s*:\s*"([^"]+)"/);
+        if (nameMatch) return nameMatch[1];
+        return s;
+      }
+    }
+    return s;
+  };
+
+  const getField = (row, ...keys) => {
+    for (const k of keys) {
+      if (row[k] !== undefined && row[k] !== null && row[k] !== '') {
+        return cleanValue(row[k]);
+      }
+    }
+    return '';
+  };
+
+  const normalizePercent = (v) => {
+    if (v === null || v === undefined || v === '') return 0;
+    let n = typeof v === 'number' ? v : parseFloat(String(v).replace('%', '').trim());
+    if (isNaN(n)) return 0;
+    if (n > 0 && n <= 1) n = n * 100;
+    return Math.max(0, Math.min(100, Math.round(n)));
+  };
+
+  const stripHtml = (raw) => {
+    if (raw === null || raw === undefined) return '';
+    let s = String(raw);
+    s = s.replace(/<\s*(br|\/p|\/div|\/li|\/h[1-6])\s*\/?>/gi, '\n');
+    s = s.replace(/<[^>]+>/g, '');
+    const entities = {
+      '&nbsp;': ' ', '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"',
+      '&#39;': "'", '&apos;': "'", '&rsquo;': '\u2019', '&lsquo;': '\u2018',
+      '&rdquo;': '\u201D', '&ldquo;': '\u201C', '&mdash;': '\u2014',
+      '&ndash;': '\u2013', '&hellip;': '\u2026',
+    };
+    s = s.replace(/&[a-z#0-9]+;/gi, (m) => {
+      if (entities[m.toLowerCase()] !== undefined) return entities[m.toLowerCase()];
+      const num = m.match(/^&#(\d+);$/);
+      if (num) { try { return String.fromCharCode(parseInt(num[1], 10)); } catch (e) { return ''; } }
+      return '';
+    });
+    s = s.replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+    return s;
+  };
+
+  // ---------- Load & parse CSVs from URLs ----------
+  useEffect(() => {
+    const parseFile = (url, label) =>
+      new Promise(async (resolve, reject) => {
+        try {
+          if (!url || url.startsWith('YOUR_')) {
+            reject(new Error(`Placeholder URL not replaced for "${label}". Update CSV_URLS at the top of this file.`));
+            return;
+          }
+          const response = await fetch(url);
+          if (!response.ok) throw new Error(`HTTP ${response.status} while fetching ${label}`);
+          const text = await response.text();
+          Papa.parse(text, {
+            header: true,
+            dynamicTyping: true,
+            skipEmptyLines: true,
+            transformHeader: (h) => h.trim(),
+            complete: (results) => resolve(results.data),
+            error: (err) => reject(err),
+          });
+        } catch (err) {
+          reject(err);
+        }
+      });
+
+    const load = async () => {
+      try {
+        const [approvedRows, promptRows, activeRows, workItemRows] = await Promise.all([
+          parseFile(CSV_URLS.approvedInnovations, 'Approved Innovations'),
+          parseFile(CSV_URLS.promptLibrary,       'Prompt Library'),
+          parseFile(CSV_URLS.shareYourProject,    'Share Your Project'),
+          parseFile(CSV_URLS.workItems,           'Work Items'),
+        ]);
+
+        const approvedClean = approvedRows
+          .filter((r) => r && getField(r, 'Title'))
+          .map((r) => ({
+            title: getField(r, 'Title'),
+            solutionType: getField(r, 'Solution Type', 'SolutionType') || 'Other',
+          }));
+
+        const promptClean = promptRows
+          .filter((r) => r && getField(r, 'Title'))
+          .map((r) => ({
+            title: getField(r, 'Title'),
+            solutionType: 'Prompt',
+          }));
+
+        const allProjectsClean = activeRows
+          .filter((r) => r && getField(r, 'Title'))
+          .map((r) => {
+            const status = getField(r, 'Status');
+            const progress = getField(r, 'Progress');
+            const archive = r['Archive'];
+            const archiveStr = String(cleanValue(archive)).toLowerCase().trim();
+            const title = getField(r, 'Title');
+            let expert = getField(
+              r, 'Innovation Expert/Partner', 'AIExpert_x002f_Partner',
+              'Innovation Expert', 'AI Expert/Partner'
+            );
+
+            const titleNorm = String(title).trim().toLowerCase();
+            let percentLabel = null;
+
+            if (titleNorm === 'ai colleague') {
+              const hasJennifer = String(expert).toLowerCase().includes('jennifer carr');
+              if (!hasJennifer) expert = expert ? `${expert}, Jennifer Carr` : 'Jennifer Carr';
+            }
+            if (titleNorm === 'aeo/geo') {
+              percentLabel = 'To be updated';
+            }
+
+            return {
+              title, status, progress,
+              priority: getField(r, 'Priority'),
+              sprint: getField(r, 'Sprint'),
+              archive, archiveStr, expert,
+              percent: normalizePercent(getField(r, '% Completion', 'OData__x0025__x0020_Completion', 'Percent Complete')),
+              percentLabel,
+              solutionType: getField(r, 'Solution Type', 'SolutionType'),
+            };
+          });
+
+        const activeClean = allProjectsClean.filter((row) => {
+          const s = String(row.status).toLowerCase();
+          const p = String(row.progress).toLowerCase();
+          const a = row.archiveStr;
+          if (s === 'approved' || s === 'archived') return false;
+          if (p === 'approved' || p === 'archived') return false;
+          if (a === 'approved' || a === 'archived' || a === 'yes' || a === 'true' || a === 'y' || a === '1' || a === 'checked') return false;
+          return true;
+        });
+
+        const workItemsClean = workItemRows
+          .filter((r) => r && (getField(r, 'Title') || getField(r, 'Project')))
+          .map((r) => ({
+            project:     getField(r, 'Project'),
+            itemType:    getField(r, 'Item Type', 'ItemType'),
+            title:       getField(r, 'Title'),
+            description: stripHtml(getField(r, 'Description')),
+            assignedTo:  getField(r, 'Assigned To', 'AssignedTo'),
+            status:      getField(r, 'Status'),
+            percent:     normalizePercent(getField(r, '% Complete', 'Percent Complete', 'PercentComplete')),
+            priority:    getField(r, 'Priority'),
+          }));
+
+        setApproved(approvedClean);
+        setPrompts(promptClean);
+        setAllProjects(allProjectsClean);
+        setActive(activeClean);
+        setWorkItems(workItemsClean);
+        setLoading(false);
+      } catch (err) {
+        console.error(err);
+        setError(err.message || 'Failed to load data');
+        setLoading(false);
+      }
+    };
+
+    load();
+  }, []);
+
+  // ---------- Derived data ----------
+  const completedAll = [...approved, ...prompts];
+  const totalCompleted = completedAll.length;
+
+  const typeCounts = completedAll.reduce((acc, item) => {
+    const t = item.solutionType || 'Other';
+    acc[t] = (acc[t] || 0) + 1;
+    return acc;
+  }, {});
+
+  const typeStyles = {
+    Prompt:     { bg: 'bg-violet-100',  text: 'text-violet-800',  ring: 'ring-violet-200',  icon: MessageSquare },
+    Agent:      { bg: 'bg-blue-100',    text: 'text-blue-800',    ring: 'ring-blue-200',    icon: Bot },
+    Automation: { bg: 'bg-emerald-100', text: 'text-emerald-800', ring: 'ring-emerald-200', icon: Workflow },
+    Script:     { bg: 'bg-amber-100',   text: 'text-amber-800',   ring: 'ring-amber-200',   icon: FileCode },
+    Workflow:   { bg: 'bg-teal-100',    text: 'text-teal-800',    ring: 'ring-teal-200',    icon: Workflow },
+    Dashboard:  { bg: 'bg-indigo-100',  text: 'text-indigo-800',  ring: 'ring-indigo-200',  icon: BarChart3 },
+    Other:      { bg: 'bg-slate-100',   text: 'text-slate-800',   ring: 'ring-slate-200',   icon: Wrench },
+  };
+  const getTypeStyle = (t) => typeStyles[t] || typeStyles.Other;
+
+  const pipelineCount = active.filter((r) => String(r.progress).toLowerCase() === 'not started').length;
+  const inProgressCount = active.filter((r) => {
+    const p = String(r.progress).toLowerCase();
+    return p && p !== 'approved' && p !== 'on hold' && p !== 'not started';
+  }).length;
+
+  const sprintItems = allProjects
+    .filter((r) => String(r.sprint).trim().toLowerCase() === CURRENT_SPRINT.toLowerCase())
+    .sort((a, b) => b.percent - a.percent);
+
+  const sortedActive = [...active]
+    .filter((r) => String(r.progress).toLowerCase() !== 'on hold')
+    .sort((a, b) => {
+      const { key, direction } = sortConfig;
+      const dir = direction === 'asc' ? 1 : -1;
+      const av = a[key]; const bv = b[key];
+      if (key === 'percent') return ((av || 0) - (bv || 0)) * dir;
+      const as = String(av || '').toLowerCase();
+      const bs = String(bv || '').toLowerCase();
+      if (as < bs) return -1 * dir;
+      if (as > bs) return 1 * dir;
+      return 0;
+    });
+
+  const searchTerm = searchQuery.trim().toLowerCase();
+  const filteredActive = searchTerm
+    ? sortedActive.filter((item) => {
+        const haystack = [item.title, item.expert, item.progress]
+          .map((v) => String(v || '').toLowerCase()).join(' | ');
+        return haystack.includes(searchTerm);
+      })
+    : sortedActive;
+
+  const allActiveCount = active.filter((r) => String(r.progress).toLowerCase() !== 'on hold').length;
+
+  const handleSort = (key) => {
+    setSortConfig((prev) => {
+      if (prev.key === key) return { key, direction: prev.direction === 'asc' ? 'desc' : 'asc' };
+      return { key, direction: key === 'percent' ? 'desc' : 'asc' };
+    });
+  };
+
+  const SortIcon = ({ columnKey }) => {
+    if (sortConfig.key !== columnKey) return <ArrowUpDown className="w-3.5 h-3.5 text-slate-400" />;
+    return sortConfig.direction === 'asc'
+      ? <ArrowUp className="w-3.5 h-3.5 text-indigo-600" />
+      : <ArrowDown className="w-3.5 h-3.5 text-indigo-600" />;
+  };
+
+  // ---------- Loading / error ----------
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3 text-slate-600">
+          <Loader2 className="w-10 h-10 animate-spin text-indigo-600" />
+          <p className="text-sm font-medium">Loading innovation data…</p>
+        </div>
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+        <div className="max-w-md bg-white rounded-2xl shadow-sm border border-rose-200 p-6">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-6 h-6 text-rose-500 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-semibold text-slate-900">Couldn't load data</h3>
+              <p className="text-sm text-slate-600 mt-1">{error}</p>
+              <p className="text-xs text-slate-500 mt-3">
+                Make sure all four CSV URLs are set correctly in <code className="bg-slate-100 px-1 rounded">CSV_URLS</code> at the top of the file.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ---------- UI helpers ----------
+  const ProgressBar = ({ value }) => (
+    <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+      <div className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-all" style={{ width: `${value}%` }} />
+    </div>
+  );
+
+  const PercentDisplay = ({ item, mode = 'inline' }) => {
+    if (item.percentLabel) {
+      if (mode === 'big') return <span className="text-base font-semibold text-amber-700">{item.percentLabel}</span>;
+      return <span className="inline-block rounded-full px-2.5 py-0.5 text-xs font-medium bg-amber-100 text-amber-700 whitespace-nowrap">{item.percentLabel}</span>;
+    }
+    if (mode === 'card' || mode === 'big') {
+      return <span className={mode === 'big' ? 'text-2xl font-bold text-slate-900' : 'text-sm font-bold text-slate-900'}>{item.percent}%</span>;
+    }
+    return (
+      <div className="flex items-center gap-2">
+        <div className="flex-1"><ProgressBar value={item.percent} /></div>
+        <span className="text-xs font-semibold text-slate-700 w-9 text-right">{item.percent}%</span>
+      </div>
+    );
+  };
+
+  const progressBadge = (p) => {
+    const s = String(p).toLowerCase();
+    if (s === 'not started') return 'bg-slate-100 text-slate-700';
+    if (s === 'in progress') return 'bg-blue-100 text-blue-700';
+    if (s === 'in sprint')   return 'bg-violet-100 text-violet-700';
+    if (s === 'on hold')     return 'bg-amber-100 text-amber-700';
+    if (s === 'in review' || s === 'review') return 'bg-emerald-100 text-emerald-700';
+    return 'bg-slate-100 text-slate-700';
+  };
+  const statusBadge = (s) => {
+    const v = String(s).toLowerCase();
+    if (v === 'done' || v === 'completed' || v === 'closed') return 'bg-emerald-100 text-emerald-700';
+    if (v === 'in progress' || v === 'active') return 'bg-blue-100 text-blue-700';
+    if (v === 'to do' || v === 'new' || v === 'not started') return 'bg-slate-100 text-slate-700';
+    if (v === 'blocked' || v === 'rejected') return 'bg-rose-100 text-rose-700';
+    if (v === 'in review' || v === 'review') return 'bg-amber-100 text-amber-700';
+    return 'bg-slate-100 text-slate-700';
+  };
+  const priorityBadge = (p) => {
+    const v = String(p).toLowerCase();
+    if (v.includes('urgent') || v.includes('critical') || v.includes('high')) return 'bg-rose-100 text-rose-700';
+    if (v.includes('medium') || v.includes('normal')) return 'bg-amber-100 text-amber-700';
+    if (v.includes('low')) return 'bg-slate-100 text-slate-600';
+    return 'bg-slate-100 text-slate-600';
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-6">
+
+        {/* Header */}
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 flex items-center gap-2">
+              <Sparkles className="w-7 h-7 text-indigo-600" />
+              Customer Enablement Innovation Center
+            </h1>
+            <p className="text-sm text-slate-500 mt-1">Live snapshot of completed and in-flight innovation work</p>
+          </div>
+
+          <div className="relative" onMouseEnter={() => setNavOpen(true)} onMouseLeave={() => setNavOpen(false)}>
+            <button onClick={() => setNavOpen((o) => !o)} className="flex items-center gap-2 bg-white border border-slate-200 hover:border-indigo-300 hover:shadow-md text-slate-800 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all">
+              <Sparkles className="w-4 h-4 text-indigo-600" />
+              CE Innovation Center
+              <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform ${navOpen ? 'rotate-180' : ''}`} />
+            </button>
+            {navOpen && (
+              <div className="absolute right-0 top-full pt-2 z-40 w-72">
+                <div className="bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden">
+                  <a href="https://delteko365.sharepoint.com/sites/CustomerLearningExperience/SitePages/Innovation-Knowledge-Share.aspx" target="_blank" rel="noopener noreferrer" className="group flex items-center gap-3 px-4 py-3 hover:bg-blue-50 transition-colors border-b border-slate-100">
+                    <div className="bg-blue-100 group-hover:bg-blue-200 rounded-lg p-2 transition-colors flex-shrink-0"><Hammer className="w-4 h-4 text-blue-600" /></div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-slate-900">In the Works</p>
+                      <p className="text-xs text-slate-500 truncate">Innovation Knowledge Share</p>
+                    </div>
+                    <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-600 flex-shrink-0" />
+                  </a>
+                  <a href="https://delteko365.sharepoint.com/sites/CustomerLearningExperience/SitePages/Innovation-Showcase.aspx" target="_blank" rel="noopener noreferrer" className="group flex items-center gap-3 px-4 py-3 hover:bg-indigo-50 transition-colors border-b border-slate-100">
+                    <div className="bg-indigo-100 group-hover:bg-indigo-200 rounded-lg p-2 transition-colors flex-shrink-0"><Lightbulb className="w-4 h-4 text-indigo-600" /></div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-slate-900">Approved Innovations</p>
+                      <p className="text-xs text-slate-500 truncate">Innovation Showcase</p>
+                    </div>
+                    <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-indigo-600 flex-shrink-0" />
+                  </a>
+                  <a href="https://delteko365.sharepoint.com/sites/CustomerLearningExperience/Lists/CLX%20Prompt%20Library/AllItems.aspx?e=UuTv2l&CID=5b9bf153%2Dff55%2D4ee7%2Db8ba%2Dc31ee2b0fc41" target="_blank" rel="noopener noreferrer" className="group flex items-center gap-3 px-4 py-3 hover:bg-violet-50 transition-colors">
+                    <div className="bg-violet-100 group-hover:bg-violet-200 rounded-lg p-2 transition-colors flex-shrink-0"><BookOpen className="w-4 h-4 text-violet-600" /></div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-slate-900">Prompt Library</p>
+                      <p className="text-xs text-slate-500 truncate">CLX AI Prompt Library</p>
+                    </div>
+                    <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-violet-600 flex-shrink-0" />
+                  </a>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* SECTION 1 — Approved Innovations */}
+        <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Rocket className="w-5 h-5 text-indigo-600" />
+            <h2 className="text-lg font-semibold text-slate-900">Approved Innovations</h2>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl p-6 text-white">
+              <p className="text-sm font-medium text-indigo-100">Total Completed</p>
+              <p className="text-5xl font-bold mt-2">{totalCompleted}</p>
+              <p className="text-xs text-indigo-100 mt-2">innovations</p>
+            </div>
+            <div className="lg:col-span-2">
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">By Solution Type</p>
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(typeCounts).sort((a, b) => b[1] - a[1]).map(([type, count]) => {
+                  const style = getTypeStyle(type);
+                  const Icon = style.icon;
+                  return (
+                    <button key={type} onClick={() => setSelectedType(type)} className={`${style.bg} ${style.text} ring-1 ${style.ring} rounded-full px-3 py-1.5 text-sm font-medium flex items-center gap-1.5 hover:scale-105 hover:shadow-md active:scale-95 transition-all cursor-pointer`} title={`Click to see all ${type} innovations`}>
+                      <Icon className="w-3.5 h-3.5" /><span>{type}</span><span className="font-bold">{count}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 2 — In the Works */}
+        <section>
+          <div className="flex items-center gap-2 mb-4">
+            <TrendingUp className="w-5 h-5 text-indigo-600" />
+            <h2 className="text-lg font-semibold text-slate-900">In the Works</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <button onClick={() => setSelectedKpi('pipeline')} className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex items-center gap-4 text-left hover:shadow-md hover:border-amber-300 transition-all cursor-pointer">
+              <div className="bg-amber-100 rounded-xl p-3"><ListTodo className="w-6 h-6 text-amber-600" /></div>
+              <div>
+                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">Pipeline</p>
+                <p className="text-3xl font-bold text-slate-900 mt-0.5">{pipelineCount}</p>
+                <p className="text-xs text-slate-500">not yet started</p>
+              </div>
+            </button>
+            <button onClick={() => setSelectedKpi('inprogress')} className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex items-center gap-4 text-left hover:shadow-md hover:border-blue-300 transition-all cursor-pointer">
+              <div className="bg-blue-100 rounded-xl p-3"><Clock className="w-6 h-6 text-blue-600" /></div>
+              <div>
+                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">In Progress</p>
+                <p className="text-3xl font-bold text-slate-900 mt-0.5">{inProgressCount}</p>
+                <p className="text-xs text-slate-500">actively underway</p>
+              </div>
+            </button>
+          </div>
+        </section>
+
+        {/* SECTION 3 — Current Sprint */}
+        <section>
+          <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
+            <div className="flex items-center gap-2">
+              <Zap className="w-5 h-5 text-violet-600" />
+              <h2 className="text-lg font-semibold text-slate-900">Current Sprint</h2>
+              <span className="text-xs text-slate-500">({sprintItems.length})</span>
+            </div>
+            <span className="text-xs font-semibold text-violet-700 bg-violet-100 rounded-full px-3 py-1">{CURRENT_SPRINT}</span>
+          </div>
+          {sprintItems.length === 0 ? (
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-center text-sm text-slate-500">No projects assigned to {CURRENT_SPRINT}.</div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              {sprintItems.map((item, i) => {
+                const isApproved = String(item.progress).toLowerCase() === 'approved';
+                return (
+                  <button key={i} onClick={() => setSelectedSprint(item)} className={`bg-white rounded-2xl shadow-sm border p-4 flex flex-col gap-3 transition-all cursor-pointer text-left ${isApproved ? 'border-emerald-300 ring-1 ring-emerald-100 hover:shadow-md hover:border-emerald-400 bg-gradient-to-br from-white to-emerald-50/40' : 'border-slate-200 hover:shadow-md hover:border-violet-300'}`}>
+                    <div className="flex items-start justify-between gap-2">
+                      {isApproved ? (
+                        <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-700 text-[10px] font-bold uppercase tracking-wide rounded-full px-2 py-0.5"><PartyPopper className="w-3 h-3" /> Approved</span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 bg-violet-100 text-violet-700 text-[10px] font-bold uppercase tracking-wide rounded-full px-2 py-0.5"><Zap className="w-3 h-3" /> In Sprint</span>
+                      )}
+                      <PercentDisplay item={item} mode="card" />
+                    </div>
+                    <h3 className="text-sm font-semibold text-slate-900 leading-snug line-clamp-3">{item.title}</h3>
+                    <div className="flex items-center gap-1.5 text-xs text-slate-600">
+                      <User className="w-3.5 h-3.5 text-slate-400" />
+                      <span className="truncate">{item.expert || '—'}</span>
+                    </div>
+                    {!item.percentLabel && <ProgressBar value={item.percent} />}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </section>
+
+        {/* SECTION 4 — All Active Projects */}
+        <section className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div className="p-5 border-b border-slate-100 flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center gap-2">
+              <ListTodo className="w-5 h-5 text-indigo-600" />
+              <h2 className="text-lg font-semibold text-slate-900">All Active Projects</h2>
+              <span className="text-xs text-slate-500">({filteredActive.length}{searchTerm && filteredActive.length !== allActiveCount ? ` of ${allActiveCount}` : ''})</span>
+            </div>
+            <div className="relative flex-1 sm:flex-none sm:w-72 min-w-[200px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+              <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search title, expert, or progress…" className="w-full pl-9 pr-9 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder:text-slate-400" />
+              {searchQuery && (
+                <button onClick={() => setSearchQuery('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 hover:bg-slate-200 rounded p-0.5 transition-colors" aria-label="Clear search"><X className="w-4 h-4" /></button>
+              )}
+            </div>
+          </div>
+          {filteredActive.length === 0 ? (
+            <div className="p-6 text-center text-sm text-slate-500">{searchTerm ? `No projects match "${searchQuery}".` : 'No active projects.'}</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-slate-50 text-slate-600">
+                  <tr>
+                    <th className="text-left font-semibold px-4 py-3"><button onClick={() => handleSort('title')} className="flex items-center gap-1.5 hover:text-indigo-600 transition-colors">Title <SortIcon columnKey="title" /></button></th>
+                    <th className="text-left font-semibold px-4 py-3"><button onClick={() => handleSort('expert')} className="flex items-center gap-1.5 hover:text-indigo-600 transition-colors">Innovation Expert <SortIcon columnKey="expert" /></button></th>
+                    <th className="text-left font-semibold px-4 py-3"><button onClick={() => handleSort('progress')} className="flex items-center gap-1.5 hover:text-indigo-600 transition-colors">Progress <SortIcon columnKey="progress" /></button></th>
+                    <th className="text-left font-semibold px-4 py-3 min-w-[180px]"><button onClick={() => handleSort('percent')} className="flex items-center gap-1.5 hover:text-indigo-600 transition-colors">% Complete <SortIcon columnKey="percent" /></button></th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {filteredActive.map((item, i) => (
+                    <tr key={i} className="hover:bg-slate-50">
+                      <td className="px-4 py-3 font-medium text-slate-900">{item.title}</td>
+                      <td className="px-4 py-3 text-slate-700">{item.expert || '—'}</td>
+                      <td className="px-4 py-3"><span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${progressBadge(item.progress)}`}>{item.progress || '—'}</span></td>
+                      <td className="px-4 py-3"><PercentDisplay item={item} mode="inline" /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+
+        <div className="text-center text-xs text-slate-400 py-2">
+          Data sourced from Approved Innovations, Prompt Library, Share Your Project, and Work Items
+        </div>
+      </div>
+
+      {/* Modal — innovations by solution type */}
+      {selectedType && (() => {
+        const items = completedAll.filter((i) => (i.solutionType || 'Other') === selectedType);
+        const style = getTypeStyle(selectedType);
+        const Icon = style.icon;
+        return (
+          <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50" onClick={() => setSelectedType(null)}>
+            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between p-5 border-b border-slate-100">
+                <div className="flex items-center gap-3">
+                  <div className={`${style.bg} ${style.text} rounded-xl p-2.5`}><Icon className="w-5 h-5" /></div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-900">{selectedType}</h3>
+                    <p className="text-xs text-slate-500">{items.length} {items.length === 1 ? 'innovation' : 'innovations'}</p>
+                  </div>
+                </div>
+                <button onClick={() => setSelectedType(null)} className="text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg p-1.5 transition-colors" aria-label="Close"><X className="w-5 h-5" /></button>
+              </div>
+              <div className="overflow-y-auto p-5">
+                {items.length === 0 ? <p className="text-sm text-slate-500 text-center py-6">No items in this category.</p> : (
+                  <ul className="space-y-2">
+                    {items.map((item, i) => (
+                      <li key={i} className="flex items-start gap-3 p-3 rounded-lg border border-slate-100 hover:bg-slate-50 transition-colors">
+                        <span className={`${style.bg} ${style.text} text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5`}>{i + 1}</span>
+                        <span className="text-sm text-slate-800 leading-snug">{item.title}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              <div className="border-t border-slate-100 p-4 bg-slate-50 flex justify-end">
+                <button onClick={() => setSelectedType(null)} className="px-4 py-2 bg-slate-900 text-white text-sm font-medium rounded-lg hover:bg-slate-700 transition-colors">Close</button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* Modal — Pipeline / In Progress */}
+      {selectedKpi && (() => {
+        const isPipeline = selectedKpi === 'pipeline';
+        const items = isPipeline
+          ? active.filter((r) => String(r.progress).toLowerCase() === 'not started')
+          : active.filter((r) => { const p = String(r.progress).toLowerCase(); return p && p !== 'approved' && p !== 'on hold' && p !== 'not started'; });
+        const sortedItems = [...items].sort((a, b) => b.percent - a.percent);
+        const accent = isPipeline
+          ? { bg: 'bg-amber-100', text: 'text-amber-700', icon: ListTodo, label: 'Pipeline', subtitle: 'Projects not yet started' }
+          : { bg: 'bg-blue-100',  text: 'text-blue-700',  icon: Clock,    label: 'In Progress', subtitle: 'Projects actively underway' };
+        const Icon = accent.icon;
+        return (
+          <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50" onClick={() => setSelectedKpi(null)}>
+            <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[85vh] flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between p-5 border-b border-slate-100">
+                <div className="flex items-center gap-3">
+                  <div className={`${accent.bg} ${accent.text} rounded-xl p-2.5`}><Icon className="w-5 h-5" /></div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-900">{accent.label}</h3>
+                    <p className="text-xs text-slate-500">{sortedItems.length} {sortedItems.length === 1 ? 'project' : 'projects'} · {accent.subtitle}</p>
+                  </div>
+                </div>
+                <button onClick={() => setSelectedKpi(null)} className="text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg p-1.5 transition-colors"><X className="w-5 h-5" /></button>
+              </div>
+              <div className="overflow-y-auto p-5">
+                {sortedItems.length === 0 ? <p className="text-sm text-slate-500 text-center py-6">No projects in this category.</p> : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-slate-50 text-slate-600">
+                        <tr>
+                          <th className="text-left font-semibold px-3 py-2 rounded-l-lg">Title</th>
+                          <th className="text-left font-semibold px-3 py-2">Innovation Expert</th>
+                          <th className="text-left font-semibold px-3 py-2">Progress</th>
+                          <th className="text-left font-semibold px-3 py-2 min-w-[140px] rounded-r-lg">% Complete</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {sortedItems.map((item, i) => (
+                          <tr key={i} className="hover:bg-slate-50">
+                            <td className="px-3 py-2.5 font-medium text-slate-900">{item.title}</td>
+                            <td className="px-3 py-2.5 text-slate-700">{item.expert || '—'}</td>
+                            <td className="px-3 py-2.5"><span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${progressBadge(item.progress)}`}>{item.progress || '—'}</span></td>
+                            <td className="px-3 py-2.5"><PercentDisplay item={item} mode="inline" /></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+              <div className="border-t border-slate-100 p-4 bg-slate-50 flex justify-end">
+                <button onClick={() => setSelectedKpi(null)} className="px-4 py-2 bg-slate-900 text-white text-sm font-medium rounded-lg hover:bg-slate-700 transition-colors">Close</button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* Modal — Sprint item full details + grouped work items */}
+      {selectedSprint && (() => {
+        const item = selectedSprint;
+        const isApproved = String(item.progress).toLowerCase() === 'approved';
+        const detailRows = [
+          { label: 'Title',             value: item.title },
+          { label: 'Innovation Expert', value: item.expert },
+          { label: 'Progress',          value: item.progress, badge: true },
+          { label: 'Priority',          value: item.priority },
+          { label: 'Sprint',            value: item.sprint },
+          { label: 'Solution Type',     value: item.solutionType },
+        ];
+        return (
+          <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50" onClick={() => setSelectedSprint(null)}>
+            <div className="bg-white rounded-2xl shadow-2xl max-w-xl w-full max-h-[85vh] flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
+              <div className={`flex items-center justify-between p-5 border-b border-slate-100 ${isApproved ? 'bg-gradient-to-r from-emerald-50 to-teal-50' : 'bg-gradient-to-r from-violet-50 to-indigo-50'}`}>
+                <div className="flex items-center gap-3">
+                  <div className={`${isApproved ? 'bg-emerald-100 text-emerald-700' : 'bg-violet-100 text-violet-700'} rounded-xl p-2.5`}>
+                    {isApproved ? <PartyPopper className="w-5 h-5" /> : <Zap className="w-5 h-5" />}
+                  </div>
+                  <div>
+                    {isApproved ? (
+                      <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-700 text-[10px] font-bold uppercase tracking-wide rounded-full px-2 py-0.5"><PartyPopper className="w-3 h-3" /> Approved</span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 bg-violet-100 text-violet-700 text-[10px] font-bold uppercase tracking-wide rounded-full px-2 py-0.5"><Zap className="w-3 h-3" /> In Sprint</span>
+                    )}
+                    <h3 className="text-lg font-semibold text-slate-900 mt-1">Project Details</h3>
+                  </div>
+                </div>
+                <button onClick={() => setSelectedSprint(null)} className="text-slate-400 hover:text-slate-700 hover:bg-white/60 rounded-lg p-1.5 transition-colors"><X className="w-5 h-5" /></button>
+              </div>
+              <div className="overflow-y-auto p-5 space-y-5">
+                <div><h4 className="text-xl font-bold text-slate-900 leading-tight">{item.title || '—'}</h4></div>
+                <div className="bg-slate-50 rounded-xl p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Completion</span>
+                    <PercentDisplay item={item} mode="big" />
+                  </div>
+                  {!item.percentLabel && <ProgressBar value={item.percent} />}
+                </div>
+                <div className="space-y-2">
+                  {detailRows.map((row) => (
+                    <div key={row.label} className="grid grid-cols-3 gap-3 py-2 border-b border-slate-100 last:border-b-0">
+                      <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide flex items-center">{row.label}</div>
+                      <div className="col-span-2 text-sm text-slate-800">
+                        {row.badge && row.value ? (
+                          <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${progressBadge(row.value)}`}>{row.value}</span>
+                        ) : (row.value || <span className="text-slate-400">—</span>)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Work Items — grouped */}
+                {(() => {
+                  const projectWorkItems = workItems.filter((w) => String(w.project).trim().toLowerCase() === String(item.title).trim().toLowerCase());
+                  const bucketize = (wi) => {
+                    const status = String(wi.status).toLowerCase().trim();
+                    const type = String(wi.itemType).toLowerCase().trim();
+                    const isCompleted = status === 'completed' || status === 'done' || status === 'closed';
+                    const isQuestionDecision = type === 'question/decision';
+                    if (isCompleted && isQuestionDecision) return 'resolved';
+                    if (isCompleted) return 'completed';
+                    if (status === 'not started' || status === 'to do' || status === 'todo' || status === 'new') return 'backlog';
+                    return 'inprogress';
+                  };
+                  const groupDefs = {
+                    inprogress: { label: 'In Progress', icon: Clock,        iconBg: 'bg-blue-100',    iconText: 'text-blue-700',    countCls: 'bg-blue-50 text-blue-700' },
+                    backlog:    { label: 'Backlog',     icon: Inbox,        iconBg: 'bg-slate-100',   iconText: 'text-slate-600',   countCls: 'bg-slate-100 text-slate-600' },
+                    completed:  { label: 'Completed',   icon: CheckCircle2, iconBg: 'bg-emerald-100', iconText: 'text-emerald-700', countCls: 'bg-emerald-50 text-emerald-700' },
+                    resolved:   { label: 'Resolved',    icon: HelpCircle,   iconBg: 'bg-violet-100',  iconText: 'text-violet-700',  countCls: 'bg-violet-50 text-violet-700' },
+                  };
+                  const groups = { inprogress: [], backlog: [], resolved: [], completed: [] };
+                  projectWorkItems.forEach((wi) => { groups[bucketize(wi)].push(wi); });
+                  const groupOrder = ['inprogress', 'backlog', 'completed', 'resolved'];
+
+                  const renderItemCard = (wi, i) => (
+                    <div key={i} className="border border-slate-200 rounded-xl p-3 hover:border-indigo-200 hover:bg-slate-50 transition-colors">
+                      <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {wi.itemType && <span className="bg-indigo-50 text-indigo-700 text-[10px] font-bold uppercase tracking-wide rounded px-1.5 py-0.5">{wi.itemType}</span>}
+                          {wi.status && <span className={`text-[10px] font-semibold rounded-full px-2 py-0.5 ${statusBadge(wi.status)}`}>{wi.status}</span>}
+                          {wi.priority && <span className={`inline-flex items-center gap-0.5 text-[10px] font-semibold rounded-full px-2 py-0.5 ${priorityBadge(wi.priority)}`}><Flag className="w-2.5 h-2.5" /> {wi.priority}</span>}
+                        </div>
+                        <span className="text-xs font-bold text-slate-700">{wi.percent}%</span>
+                      </div>
+                      <p className="text-sm font-semibold text-slate-900 leading-snug">{wi.title || '—'}</p>
+                      {wi.description && <p className="text-xs text-slate-600 mt-1 leading-relaxed whitespace-pre-line">{wi.description}</p>}
+                      <div className="mt-2 flex items-center gap-3">
+                        {wi.assignedTo && <div className="flex items-center gap-1 text-xs text-slate-600 flex-shrink-0"><User className="w-3 h-3 text-slate-400" /><span className="truncate">{wi.assignedTo}</span></div>}
+                        <div className="flex-1 min-w-[60px]"><ProgressBar value={wi.percent} /></div>
+                      </div>
+                    </div>
+                  );
+
+                  return (
+                    <div>
+                      <div className="flex items-center gap-2 mb-3">
+                        <ListChecks className="w-4 h-4 text-indigo-600" />
+                        <h5 className="text-sm font-semibold text-slate-900">Work Items</h5>
+                        <span className="text-xs text-slate-500">({projectWorkItems.length})</span>
+                      </div>
+                      {projectWorkItems.length === 0 ? (
+                        <div className="text-xs text-slate-500 bg-slate-50 rounded-lg p-4 text-center">No work items linked to this project.</div>
+                      ) : (
+                        <div className="space-y-4">
+                          {groupOrder.map((key) => {
+                            const items = groups[key];
+                            if (items.length === 0) return null;
+                            const def = groupDefs[key];
+                            const Icon = def.icon;
+                            return (
+                              <div key={key}>
+                                <div className="flex items-center gap-2 mb-2">
+                                  <div className={`${def.iconBg} ${def.iconText} rounded-md p-1`}><Icon className="w-3.5 h-3.5" /></div>
+                                  <h6 className="text-xs font-bold uppercase tracking-wide text-slate-700">{def.label}</h6>
+                                  <span className={`text-[10px] font-bold rounded-full px-1.5 py-0.5 ${def.countCls}`}>{items.length}</span>
+                                </div>
+                                <div className="space-y-2">{items.map(renderItemCard)}</div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+              </div>
+              <div className="border-t border-slate-100 p-4 bg-slate-50 flex justify-end">
+                <button onClick={() => setSelectedSprint(null)} className="px-4 py-2 bg-slate-900 text-white text-sm font-medium rounded-lg hover:bg-slate-700 transition-colors">Close</button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+    </div>
+  );
+};
+
+const root = createRoot(document.getElementById('root'));
+root.render(<Dashboard />);
+</script>
+</body>
+</html>
