@@ -1,4 +1,6 @@
 ﻿"Title","Description","Link","Image","Changelog","Video","Guide/Documentation","Innovation Expert/Partner","Solution Type","ID"
+"PTO Process Revamp","Revamp of our existing Out of Office process based on what we in CLX PCD A&ICEITPPSSTT team has recently implemented to make things more streamlined through automation.",,"Reserved_ImageAttachment_[5]_[Image][32]_[88add0dd008f49ba96e672bcea0561a2][1]_[5].png",,,,"Mon Blaza","Automation","28"
+"AI Colleague (Maconomy)","An AI colleague for the Maconomy Doc team to edit / finalize bug descriptions. The AI is provoked by Editing Status change. Writers will not be involved in bug work at all. ",,"Reserved_ImageAttachment_[5]_[Image][32]_[687b1f54eb2b44079031fe0e12aa2b04][1]_[1].png",,,,,"GenAI Plug-in for ADO/TFS","27"
 "DLH Request Forms","Tracker and Form for the following DLH Process: 
 Deltek Learning Hub Platform Issues
 Deltek Learning Hub Feedback and Enhancement Requests
