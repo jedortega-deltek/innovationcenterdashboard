@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>CE Innovation Center Dashboard</title>
 
+<!-- Prevent browser caching of this page so updates always show on next visit -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+
 <!-- Tailwind CSS via Play CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
 
@@ -59,7 +64,7 @@ import {
    - Any public CSV URL
    ============================================================ */
 const CSV_URLS = {
-  approvedInnovations: './Approved Innovations (4).csv?v=2',
+  approvedInnovations: './Approved Innovations (4).csv',
   promptLibrary:       './CLX AI Prompt Library (2).csv',
   shareYourProject:    './Share your project (12).csv',
   workItems:           './Work Items (2).csv',
@@ -159,7 +164,9 @@ const Dashboard = () => {
             reject(new Error(`Placeholder URL not replaced for "${label}". Update CSV_URLS at the top of this file.`));
             return;
           }
-          const response = await fetch(url);
+          // Append a unique cache-buster so the browser always pulls fresh CSV data
+          const cacheBuster = (url.includes('?') ? '&' : '?') + 't=' + Date.now();
+          const response = await fetch(url + cacheBuster);
           if (!response.ok) throw new Error(`HTTP ${response.status} while fetching ${label}`);
           const text = await response.text();
           Papa.parse(text, {
