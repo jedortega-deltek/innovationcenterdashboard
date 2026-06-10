@@ -53,15 +53,15 @@
 "Coffee Break Reports","2 - Important","[""Automation""]","In progress","Louise Barr;Jadan Smithers","Mon Blaza","False","N/A","[""CLX Innovation Center""]",
 "Docs in People Planner Source Code","2 - Important","[""Agent""]","Not started","Orlene Abundo","Orlene Abundo;Ronny Mathiasen","False","N/A","[""CLX Innovation Center""]",
 "C&D Skills Matrix","2 - Important","[""Automation""]","In progress","Sushmitha Singh",,"False","N/A","[""CLX Innovation Center""]",
-"DITA-to-MD Converter","1 - Urgent","[""Automation""]","In progress","Mon Blaza","Matt Briggs;Claude Trono","False","2026 S5 (June 2 - June 23)","[""CLX Innovation Center""]","87%"
+"DITA-to-MD Converter","1 - Urgent","[""Automation""]","Testing","Mon Blaza","Matt Briggs;Claude Trono","False","2026 S5 (June 2 - June 23)","[""CLX Innovation Center""]","100%"
 "AEO/GEO","1 - Urgent","[""Search Optimization"",""Standards/Style Guide""]","For review","Mon Blaza;Elaine Stott","Ray Carlo Abacan;Mon Blaza;Elaine Stott;Bert Niverba","False","2026 S5 (June 2 - June 23)","[""CLX Innovation Center""]","70%"
-"ArchiSnapper Translation Needs","1 - Urgent","[""Automation"",""GenAI""]","In progress","Elaine Stott","Claude Trono","False","2026 S5 (June 2 - June 23)","[""CLX Innovation Center""]","30%"
-"Markdown Validator","1 - Urgent","[""Automation""]","Approved","Vincent Bautista","Vincent Bautista;Matt Briggs;Mon Blaza","False","2026 S5 (June 2 - June 23)","[""CLX Innovation Center""]","100%"
+"ArchiSnapper Translation Needs","1 - Urgent","[""Automation"",""GenAI""]","In progress","Elaine Stott","Claude Trono","False","2026 S5 (June 2 - June 23)","[""CLX Innovation Center""]","60%"
+"Markdown Validator","1 - Urgent","[""Automation""]","Approved","Vincent Bautista","Vincent Bautista;Matt Briggs;Mon Blaza","True","2026 S5 (June 2 - June 23)","[""CLX Innovation Center""]","100%"
 "Training and Development Curriculum","2 - Important","[""Automation""]","In progress","Sushmitha Singh",,"False","N/A","[""CLX Innovation Center""]",
 "AI Workflows (CM/SME)","2 - Important","[""Data Management""]","In progress","Jed Ortega","Jed Ortega;Jennifer Carr;Mon Blaza;Bert Niverba","False","N/A","[""CLX Innovation Center""]","75%"
 "Innovation Dashboard","2 - Important","[""Data Management""]","For review","Jed Ortega","Jed Ortega","False","N/A","[""CLX Innovation Center""]","100%"
 "AI Documentation Planner","3 - Medium","[""Authoring Tool""]","In progress","Matt Briggs",,"False","N/A","[""CLX Innovation Center""]","65%"
 "IAG Development Assistant","3 - Medium","[""Agent""]","In progress","Karen Denise Kalaw;Bert Niverba","Bert Niverba","False","N/A","[""CLX Innovation Center""]",
-"Smartsheet Trackers Overhaul (MS List, Automations & Dashboard)","1 - Urgent","[""Data Management"",""Automation""]","Not started","Jed Ortega","Remil Hizon;Jenny Dollente;Mon Blaza;Ketch Pablo","False","2026 S5 (June 2 - June 23)","[""CLX Innovation Center""]",
+"Smartsheet Trackers Overhaul (MS List, Automations & Dashboard)","1 - Urgent","[""Data Management"",""Automation""]","In progress","Jed Ortega","Remil Hizon;Jenny Dollente;Mon Blaza;Ketch Pablo","False","2026 S5 (June 2 - June 23)","[""CLX Innovation Center""]",
 "Markdown MegaBundle Processing Tool","1 - Urgent","[""Automation""]","For review","Mon Blaza","Mon Blaza","False","N/A","[""CLX Innovation Center""]","100%"
 "Transcript to Guide Agent","2 - Important","[""Agent""]","In progress","Pete Daryl Lapuz","Kim Adriano;Bert Niverba","False","N/A","[""CLX Innovation Center""]",
