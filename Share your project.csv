@@ -1,67 +1,70 @@
-﻿"Title","Priority","Solution Type","Progress","Submitter","Innovation Expert/Partner","Archive","Sprint","Oversight","% Completion"
-"MVP - Innovation Knowledge Hub (aka CLX Innovation Center)","1 - Urgent","[""Site""]","Approved","Jennifer Carr;Mon Blaza;Bert Niverba",,"True",,,
-"DLH Keywords Report Cleanup","2 - Important","[""Prompt""]","Approved","Remil Hizon;Bert Niverba","Remil Hizon;Bert Niverba","True",,,
-"Analyze large format segmented data to generate user intent","1 - Urgent","[""Prompt""]","Approved","Remil Hizon","Remil Hizon","True",,,
-"Markdown Content Storage through GitHub","1 - Urgent","[""Storage""]","Approved","Elaine Stott","Ann Margarett Mendoza;Rochelle Domingo;Matt Briggs;Claude Trono;Mon Blaza;Elaine Stott","True","2026 S2 (March 3 - 24)","[""CLX Innovation Center""]",
-"Prompt: Create quarterly release schedule based on items in smartsheet from prior release","2 - Important","[""Prompt""]","Approved","Malea Heller","Malea Heller","True",,,
-"Documentation Style Guide Validator","2 - Important","[""Automation""]","In progress","Matt Briggs","Matt Briggs","False",,"[""CLX Innovation Center""]",
-"Release Notes - Generating from Code","1 - Urgent","[""Automation""]","Approved","Elaine Stott","Ron Santos;Rochelle Domingo","True","2026 S2 (March 3 - 24)","[""CLX Innovation Center""]",
-"Automatically Run Custom Prompt Weekly and Send Results to Email","3 - Medium","[""Automation""]","In progress","Fina Shipley","Bert Niverba","False",,,
-"Tools - Page Builder","1 - Urgent","[""Authoring Tool""]","Approved","Rochelle Domingo","Rochelle Domingo","True",,,
-"Request: Explore AI / automation options for Smartsheet ↔ TFS tracking","1 - Urgent","[""Automation""]","On hold","Anna Dixon","Rochelle Domingo;Jannus Domingo","False","2026 S3 (April 7 - April 28)","[""CLX Innovation Center""]",
-"Gainsight PX Data Automation","2 - Important","[""Automation""]","Not started","Paulo Esquivias;Mitch Bernadas","Gian Carlo Almiranez;Paulo Esquivias;Mitch Bernadas","False",,"[""CLX Innovation Center""]",
-"Deltek Proofreader Agent","2 - Important","[""Agent""]","Approved","Bert Niverba","Bert Niverba","True",,,
-"Automate scraping of Deltek Terms and save to XLS","3 - Medium","[""Automation""]","Not started","Bert Niverba","Bert Niverba","False",,"[""CLX Innovation Center""]",
-"OLH/Admin Guide Update Recommender (aka Mega Prompt)","1 - Urgent","[""Agent""]","Approved","Jennifer Carr","Jennifer Carr;Bert Niverba","True","2025 S1 (Dec 1 - Dec 19)",,
-"Automate ELearning Help Link Testing","2 - Important","[""Automation""]","Approved","(INACTIVE) Melanie Singer","(INACTIVE) Melanie Singer","True",,,
-"Automate video demos of Talent Management How-To Topics","3 - Medium","[""Automation""]","On hold","(INACTIVE) Melanie Singer","(INACTIVE) Melanie Singer;Mitch Bernadas","False",,,
-"AI-Assisted Tool for IAG Content Development","3 - Medium","[""Automation""]","In progress","Carlo Cortez","Bert Niverba;Mitch Bernadas;Carlo Cortez","False",,,
-"Automating reminders for completed IAGs to support an efficient IAG Lifecycle.","3 - Medium","[""Automation""]","For review","Gigi Garcia","Jannus Domingo","False",,,
-"Feature Spotlight Writer","2 - Important","[""Agent""]","Approved","Christine Telesforo;Bert Niverba",,"True",,,
-"Customer Success Birthdays and Anniversaries Extractor","3 - Medium","[""Prompt""]","Not started","Bert Niverba;Jaime Henry",,"False",,,
-"Costpoint Upgrade Impact Analysis ","2 - Important","[""Prompt""]","Approved","Bert Niverba;Barbara Bill","Bert Niverba","True",,,
-"Online Help - Leverage Claude Code to accelerate the creation of online help topics for TIP","2 - Important","[""Prompt""]","Approved","Sylvia Siguenza","Sylvia Siguenza;Rochelle Domingo;Mon Blaza;Bert Niverba","True",,,
-"Prompt: Performance Enablement Pre-Planning and Professional Development","2 - Important","[""Prompt""]","Approved","Anna Dixon","Anna Dixon","True",,,
-"Prompt: Certification Exam Development","2 - Important","[""Prompt""]","Approved","Anna Dixon","Anna Dixon","True",,,
-"Doc in Source Code","3 - Medium","[""Agent""]","Not started","Jennifer Carr","Claude Trono","False",,,
-"Release Readiness Material","2 - Important","[""Prompt"",""Agent"",""GenAI""]","For review","Jennifer Carr","Malea Heller;Rochelle Domingo;Mon Blaza","False",,"[""CLX Innovation Center""]",
-"Style Guide Agent for Online Help","2 - Important","[""Agent""]","Approved","Angus Miranda","Mon Blaza;Angus Miranda","True",,,
-"Prompt: Certification Evaluation","2 - Important","[""Prompt""]","Approved","Sushmitha Singh","Sushmitha Singh","True",,,
-"Prompt: API Documentation Creation using YAML file in Copilot","2 - Important","[""Prompt""]","Approved","Aubrey Villasin","Aubrey Villasin","True",,,
-"Quickly stitch multiple videos and create json TOC file for ROCH360 MD conversions (CP and VP)","1 - Urgent","[""Automation""]","Approved","Bert Niverba","Kim Adriano;Bert Niverba","True",,,
-"Automate Utilization Data Process","2 - Important","[""Automation""]","In progress","Remil Hizon","Remil Hizon;Gian Carlo Almiranez","False",,"[""CLX Innovation Center""]",
-"DLH Dashboard QA Analyzer","2 - Important","[""Prompt""]","Approved","Remil Hizon","Remil Hizon","True",,,
-"Word-to-MD converter","1 - Urgent","[""Automation""]","Approved","Mon Blaza","Rochelle Domingo;Matt Briggs","True",,,
-"ADO/TFS Work Item Templates","2 - Important","[""Automation""]","Approved","Danni Canibo","Danni Canibo","True",,,
-"Terminology Accuracy Agent for Replicon Content","3 - Medium","[""Agent""]","Approved","Sushmitha Singh","Sushmitha Singh","True",,,
-"Agent: Certification Questions (CertQBot)","1 - Urgent","[""Agent""]","Approved","Ray Carlo Abacan;Mon Blaza","Ray Carlo Abacan;Matt Briggs;Anna Dixon;Mon Blaza","True","2026 S1 (January 20 - Feb 9)",,
-"RN Python Script Enhancements (Markdown Output)","2 - Important","[""Automation""]","Approved","Mon Blaza","Sylvia Siguenza;Claude Trono","True",,,
-"Data Dictionary - Standardizing Descriptions","3 - Medium","[""Automation""]","Not started","Jessa Carmela Gaspacho","Mon Blaza","False",,"[""CLX Innovation Center""]",
-"Procedures Agent","3 - Medium","[""Agent""]","Not started","Jennifer Carr",,"False","N/A","[""CLX Innovation Center""]",
-"Practice Mode: Scenario‑Based Certification Trainer",,"[""Prompt""]","Approved","Ketch Pablo","Ketch Pablo","True","N/A","[""Project & Change Management""]",
-"AI‑Assisted Goal Setting & IDP Builder for 2026","3 - Medium","[""Prompt"",""GenAI""]","In progress","Ketch Pablo",,"False","N/A","[""Project & Change Management""]",
-"CLX Team PTO Process Revamp","3 - Medium","[""Automation""]","Approved","Mon Blaza","Mon Blaza","True","N/A","[""CLX Innovation Center""]","100%"
-"SP Project Management Planner","2 - Important","[""Site""]","In progress","Jed Ortega","Jed Ortega","False","N/A","[""Project & Change Management""]","80%"
-"Town Hall Questions Agent","3 - Medium","[""Agent""]","Approved","Stacy Hotes-Aprato","Stacy Hotes-Aprato","True","N/A","[""CLX Innovation Center""]","100%"
-"Release Content Assistant ","3 - Medium","[""Agent""]","Approved","Kim Adriano","Kim Adriano","True","N/A","[""CLX Innovation Center""]","100%"
-"LLM Friendly Learning Titles & Descriptions","3 - Medium","[""Prompt""]","Approved","Damon Shratter","Damon Shratter","True","N/A",,"100%"
-"Daily Project Risk Scan – Super Prompt","3 - Medium","[""Prompt""]","Testing","Ketch Pablo",,"False","N/A","[""Project & Change Management""]","50%"
-"GENERIC WEEKLY PROJECT UPDATE – SUPER PROMPT (FOR ANY PM / ANY PROJECT)","3 - Medium","[""Prompt""]","Testing","Ketch Pablo",,"False","N/A","[""CLX Innovation Center"",""Project & Change Management""]","50%"
-"Automate Coffee Break Webinar Session and Planner Event Creation","2 - Important","[""Automation""]","Not started","Anna Dixon","Mon Blaza;Louise Barr","False","N/A","[""CLX Innovation Center""]",
-"Smartsheet to MS List (DLH Request Forms)","1 - Urgent","[""Automation"",""Data Management""]","Approved","Mon Blaza","Anna Dixon;Mon Blaza;Fifi Dayrit","True","2026 S4 (May 5 - May 26)","[""CLX Innovation Center""]","100%"
-"AI Colleague (Maconomy)","1 - Urgent","[""Agent""]","Approved","Jennifer Carr","Orlene Abundo;Bogdan Szabo","True","2026 S4 (May 5 - May 26)","[""CLX Innovation Center""]","100%"
-"Coffee Break Reports","2 - Important","[""Automation""]","In progress","Louise Barr;Jadan Smithers","Mon Blaza","False","N/A","[""CLX Innovation Center""]",
-"Docs in People Planner Source Code","2 - Important","[""Agent""]","Not started","Orlene Abundo","Orlene Abundo;Ronny Mathiasen","False","N/A","[""CLX Innovation Center""]",
-"C&D Skills Matrix","2 - Important","[""Automation""]","In progress","Sushmitha Singh",,"False","N/A","[""CLX Innovation Center""]",
-"DITA-to-MD Converter","1 - Urgent","[""Automation""]","Testing","Mon Blaza","Matt Briggs;Claude Trono","False","2026 S5 (June 2 - June 23)","[""CLX Innovation Center""]","100%"
-"AEO/GEO","1 - Urgent","[""Search Optimization"",""Standards/Style Guide""]","For review","Mon Blaza;Elaine Stott","Ray Carlo Abacan;Mon Blaza;Elaine Stott;Bert Niverba","False","2026 S5 (June 2 - June 23)","[""CLX Innovation Center""]","70%"
-"ArchiSnapper Translation Needs","1 - Urgent","[""Automation"",""GenAI""]","In progress","Elaine Stott","Claude Trono","False","2026 S5 (June 2 - June 23)","[""CLX Innovation Center""]","60%"
-"Markdown Validator","1 - Urgent","[""Automation""]","Approved","Vincent Bautista","Vincent Bautista;Matt Briggs;Mon Blaza","True","2026 S5 (June 2 - June 23)","[""CLX Innovation Center""]","100%"
-"Training and Development Curriculum","2 - Important","[""Automation""]","In progress","Sushmitha Singh",,"False","N/A","[""CLX Innovation Center""]",
-"AI Workflows (CM/SME)","2 - Important","[""Data Management""]","In progress","Jed Ortega","Jed Ortega;Jennifer Carr;Mon Blaza;Bert Niverba","False","N/A","[""CLX Innovation Center""]","75%"
-"Innovation Dashboard","2 - Important","[""Data Management""]","For review","Jed Ortega","Jed Ortega","False","N/A","[""CLX Innovation Center""]","100%"
-"AI Documentation Planner","3 - Medium","[""Authoring Tool""]","In progress","Matt Briggs",,"False","N/A","[""CLX Innovation Center""]","65%"
-"IAG Development Assistant","3 - Medium","[""Agent""]","In progress","Karen Denise Kalaw;Bert Niverba","Bert Niverba","False","N/A","[""CLX Innovation Center""]",
-"Smartsheet Trackers Overhaul (MS List, Automations & Dashboard)","1 - Urgent","[""Data Management"",""Automation""]","In progress","Jed Ortega","Remil Hizon;Jenny Dollente;Mon Blaza;Ketch Pablo","False","2026 S5 (June 2 - June 23)","[""CLX Innovation Center""]",
-"Markdown MegaBundle Processing Tool","1 - Urgent","[""Automation""]","For review","Mon Blaza","Mon Blaza","False","N/A","[""CLX Innovation Center""]","100%"
-"Transcript to Guide Agent","2 - Important","[""Agent""]","In progress","Pete Daryl Lapuz","Kim Adriano;Bert Niverba","False","N/A","[""CLX Innovation Center""]",
+﻿"Title","Priority","Solution Type","Progress","Submitter","Innovation Expert/Partner","Archive","Sprint","Oversight","% Completion","ID","Created By","Modified By","Attachments"
+"MVP - Innovation Knowledge Hub (aka CLX Innovation Center)","1 - Urgent","[""Site""]","Approved","Jennifer Carr;Mon Blaza;Bert Niverba",,"True",,,,"2","Mon Blaza","Jed Ortega","1"
+"DLH Keywords Report Cleanup","2 - Important","[""Prompt""]","Approved","Remil Hizon;Bert Niverba","Remil Hizon;Bert Niverba","True",,,,"16","Bert Niverba","Remil Hizon","0"
+"Analyze large format segmented data to generate user intent","1 - Urgent","[""Prompt""]","Approved","Remil Hizon","Remil Hizon","True",,,,"30","Remil Hizon","Remil Hizon","1"
+"Markdown Content Storage through GitHub","1 - Urgent","[""Storage""]","Approved","Elaine Stott","Ann Margarett Mendoza;Rochelle Domingo;Matt Briggs;Claude Trono;Mon Blaza;Elaine Stott","True","2026 S2 (March 3 - 24)","[""CLX Innovation Center""]",,"36","Mon Blaza","Jed Ortega","1"
+"Prompt: Create quarterly release schedule based on items in smartsheet from prior release","2 - Important","[""Prompt""]","Approved","Malea Heller","Malea Heller","True",,,,"3","Malea Heller","Jed Ortega","0"
+"Documentation Style Guide Validator","2 - Important","[""Automation""]","In progress","Matt Briggs","Matt Briggs","False",,"[""CLX Innovation Center""]",,"4","Matt Briggs","Jed Ortega","0"
+"Release Notes - Generating from Code","1 - Urgent","[""Automation""]","Approved","Elaine Stott","Ron Santos;Rochelle Domingo","True","2026 S2 (March 3 - 24)","[""CLX Innovation Center""]",,"1","Mon Blaza","Jed Ortega","1"
+"Automatically Run Custom Prompt Weekly and Send Results to Email","3 - Medium","[""Automation""]","In progress","Fina Shipley","Bert Niverba","False",,,,"5","Fina Shipley","Mon Blaza","1"
+"Tools - Page Builder","1 - Urgent","[""Authoring Tool""]","Approved","Rochelle Domingo","Rochelle Domingo","True",,,,"6","Rochelle Domingo","Jed Ortega","0"
+"Request: Explore AI / automation options for Smartsheet ↔ TFS tracking","1 - Urgent","[""Automation""]","On hold","Anna Dixon","Rochelle Domingo;Jannus Domingo","False","2026 S3 (April 7 - April 28)","[""CLX Innovation Center""]",,"45","Anna Dixon","Jed Ortega","0"
+"Gainsight PX Data Automation","2 - Important","[""Automation""]","Not started","Paulo Esquivias;Mitch Bernadas","Gian Carlo Almiranez;Paulo Esquivias;Mitch Bernadas","False",,"[""CLX Innovation Center""]",,"7","Paulo Esquivias","Mon Blaza","0"
+"Deltek Proofreader Agent","2 - Important","[""Agent""]","Approved","Bert Niverba","Bert Niverba","True",,,,"8","Bert Niverba","Jed Ortega","0"
+"Automate scraping of Deltek Terms and save to XLS","3 - Medium","[""Automation""]","Not started","Bert Niverba","Bert Niverba","False",,"[""CLX Innovation Center""]",,"9","Bert Niverba","Mon Blaza","0"
+"OLH/Admin Guide Update Recommender (aka Mega Prompt)","1 - Urgent","[""Agent""]","Approved","Jennifer Carr","Jennifer Carr;Bert Niverba","True","2025 S1 (Dec 1 - Dec 19)",,,"15","Bert Niverba","Jed Ortega","1"
+"Automate ELearning Help Link Testing","2 - Important","[""Automation""]","Approved","(INACTIVE) Melanie Singer","(INACTIVE) Melanie Singer","True",,,,"10","(INACTIVE) Melanie Singer","Jed Ortega","1"
+"Automate video demos of Talent Management How-To Topics","3 - Medium","[""Automation""]","On hold","(INACTIVE) Melanie Singer","(INACTIVE) Melanie Singer;Mitch Bernadas","False",,,,"11","(INACTIVE) Melanie Singer","Jed Ortega","0"
+"AI-Assisted Tool for IAG Content Development","3 - Medium","[""Automation""]","In progress","Carlo Cortez","Bert Niverba;Mitch Bernadas;Carlo Cortez","False",,,,"12","Carlo Cortez","Mon Blaza","0"
+"Automating reminders for completed IAGs to support an efficient IAG Lifecycle.","3 - Medium","[""Automation""]","For review","Gigi Garcia","Jannus Domingo","False",,,,"13","Gigi Garcia","Jannus Domingo","0"
+"Feature Spotlight Writer","2 - Important","[""Agent""]","Approved","Christine Telesforo;Bert Niverba",,"True",,,,"14","Christine Telesforo","Jed Ortega","0"
+"Customer Success Birthdays and Anniversaries Extractor","3 - Medium","[""Prompt""]","Not started","Bert Niverba;Jaime Henry",,"False",,,,"17","Bert Niverba","Mon Blaza","0"
+"Costpoint Upgrade Impact Analysis ","2 - Important","[""Prompt""]","Approved","Bert Niverba;Barbara Bill","Bert Niverba","True",,,,"18","Bert Niverba","Jed Ortega","0"
+"Online Help - Leverage Claude Code to accelerate the creation of online help topics for TIP","2 - Important","[""Prompt""]","Approved","Sylvia Siguenza","Sylvia Siguenza;Rochelle Domingo;Mon Blaza;Bert Niverba","True",,,,"19","Sylvia Siguenza","Jed Ortega","1"
+"Prompt: Performance Enablement Pre-Planning and Professional Development","2 - Important","[""Prompt""]","Approved","Anna Dixon","Anna Dixon","True",,,,"20","Anna Dixon","Jed Ortega","1"
+"Prompt: Certification Exam Development","2 - Important","[""Prompt""]","Approved","Anna Dixon","Anna Dixon","True",,,,"21","Anna Dixon","Jed Ortega","1"
+"Doc in Source Code","3 - Medium","[""Agent""]","Not started","Jennifer Carr","Claude Trono","False",,,,"22","Jennifer Carr","Mon Blaza","0"
+"Release Readiness Material","2 - Important","[""Prompt"",""Agent"",""GenAI""]","For review","Jennifer Carr","Malea Heller;Rochelle Domingo;Mon Blaza","False",,"[""CLX Innovation Center""]",,"24","Jennifer Carr","Mon Blaza","0"
+"Style Guide Agent for Online Help","2 - Important","[""Agent""]","Approved","Angus Miranda","Mon Blaza;Angus Miranda","True",,,,"25","Angus Miranda","Mon Blaza","0"
+"Prompt: Certification Evaluation","2 - Important","[""Prompt""]","Approved","Sushmitha Singh","Sushmitha Singh","True",,,,"27","Sushmitha Singh","Jed Ortega","0"
+"Prompt: API Documentation Creation using YAML file in Copilot","2 - Important","[""Prompt""]","Approved","Aubrey Villasin","Aubrey Villasin","True",,,,"28","Aubrey Villasin","Jed Ortega","0"
+"Quickly stitch multiple videos and create json TOC file for ROCH360 MD conversions (CP and VP)","1 - Urgent","[""Automation""]","Approved","Bert Niverba","Kim Adriano;Bert Niverba","True",,,,"29","Bert Niverba","Jed Ortega","0"
+"Automate Utilization Data Process","2 - Important","[""Automation""]","In progress","Remil Hizon","Remil Hizon;Gian Carlo Almiranez","False",,"[""CLX Innovation Center""]",,"31","Remil Hizon","Mon Blaza","0"
+"DLH Dashboard QA Analyzer","2 - Important","[""Prompt""]","Approved","Remil Hizon","Remil Hizon","True",,,,"32","Remil Hizon","Jed Ortega","0"
+"Word-to-MD converter","1 - Urgent","[""Automation""]","Approved","Mon Blaza","Rochelle Domingo;Matt Briggs","True",,,,"33","Mon Blaza","Jed Ortega","0"
+"ADO/TFS Work Item Templates","2 - Important","[""Automation""]","Approved","Danni Canibo","Danni Canibo","True",,,,"37","Mon Blaza","Jed Ortega","0"
+"Terminology Accuracy Agent for Replicon Content","3 - Medium","[""Agent""]","Approved","Sushmitha Singh","Sushmitha Singh","True",,,,"26","Sushmitha Singh","Jed Ortega","0"
+"Agent: Certification Questions (CertQBot)","1 - Urgent","[""Agent""]","Approved","Ray Carlo Abacan;Mon Blaza","Ray Carlo Abacan;Matt Briggs;Anna Dixon;Mon Blaza","True","2026 S1 (January 20 - Feb 9)",,,"38","Mon Blaza","Jed Ortega","1"
+"RN Python Script Enhancements (Markdown Output)","2 - Important","[""Automation""]","Approved","Mon Blaza","Sylvia Siguenza;Claude Trono","True",,,,"39","Mon Blaza","Jed Ortega","0"
+"Data Dictionary - Standardizing Descriptions","3 - Medium","[""Automation""]","Not started","Jessa Carmela Gaspacho","Mon Blaza","False",,"[""CLX Innovation Center""]",,"40","Jessa Carmela Gaspacho","Mon Blaza","0"
+"Procedures Agent","3 - Medium","[""Agent""]","Not started","Jennifer Carr",,"False","N/A","[""CLX Innovation Center""]",,"43","Jennifer Carr","Mon Blaza","0"
+"Practice Mode: Scenario‑Based Certification Trainer",,"[""Prompt""]","Approved","Ketch Pablo","Ketch Pablo","True","N/A","[""Project & Change Management""]",,"50","Jed Ortega","Jed Ortega","0"
+"AI‑Assisted Goal Setting & IDP Builder for 2026","3 - Medium","[""Prompt"",""GenAI""]","In progress","Ketch Pablo",,"False","N/A","[""Project & Change Management""]",,"53","Ketch Pablo","Mon Blaza","0"
+"CLX Team PTO Process Revamp","3 - Medium","[""Automation""]","Approved","Mon Blaza","Mon Blaza","True","N/A","[""CLX Innovation Center""]","100%","54","Mon Blaza","Jed Ortega","0"
+"SP Project Management Planner","2 - Important","[""Site""]","In progress","Jed Ortega","Jed Ortega","False","N/A","[""Project & Change Management""]","80%","55","Jed Ortega","Jed Ortega","0"
+"Town Hall Questions Agent","3 - Medium","[""Agent""]","Approved","Stacy Hotes-Aprato","Stacy Hotes-Aprato","True","N/A","[""CLX Innovation Center""]","100%","56","Jed Ortega","Jed Ortega","0"
+"Release Content Assistant ","3 - Medium","[""Agent""]","Approved","Kim Adriano","Kim Adriano","True","N/A","[""CLX Innovation Center""]","100%","57","Jed Ortega","Jed Ortega","0"
+"LLM Friendly Learning Titles & Descriptions","3 - Medium","[""Prompt""]","Approved","Damon Shratter","Damon Shratter","True","N/A",,"100%","59","Jed Ortega","Jed Ortega","0"
+"Daily Project Risk Scan – Super Prompt","3 - Medium","[""Prompt""]","Testing","Ketch Pablo",,"False","N/A","[""Project & Change Management""]","50%","60","Ketch Pablo","Ketch Pablo","0"
+"GENERIC WEEKLY PROJECT UPDATE – SUPER PROMPT (FOR ANY PM / ANY PROJECT)","3 - Medium","[""Prompt""]","Testing","Ketch Pablo",,"False","N/A","[""CLX Innovation Center"",""Project & Change Management""]","50%","61","Ketch Pablo","Ketch Pablo","0"
+"Automate Coffee Break Webinar Session and Planner Event Creation","2 - Important","[""Automation""]","Not started","Anna Dixon","Mon Blaza;Louise Barr","False","N/A","[""CLX Innovation Center""]",,"62","Mon Blaza","Mon Blaza","0"
+"Smartsheet to MS List (DLH Request Forms)","1 - Urgent","[""Automation"",""Data Management""]","Approved","Mon Blaza","Anna Dixon;Mon Blaza;Fifi Dayrit","True","2026 S4 (May 5 - May 26)","[""CLX Innovation Center""]","100%","64","Mon Blaza","Jed Ortega","0"
+"AI Colleague (Maconomy)","1 - Urgent","[""Agent""]","Approved","Jennifer Carr","Orlene Abundo;Bogdan Szabo","True","2026 S4 (May 5 - May 26)","[""CLX Innovation Center""]","100%","41","Jennifer Carr","Jed Ortega","1"
+"Coffee Break Reports","2 - Important","[""Automation""]","In progress","Louise Barr;Jadan Smithers","Mon Blaza","False","N/A","[""CLX Innovation Center""]",,"65","Jadan Smithers","Mon Blaza","0"
+"Docs in People Planner Source Code","2 - Important","[""Agent""]","Not started","Orlene Abundo","Orlene Abundo;Ronny Mathiasen","False","N/A","[""CLX Innovation Center""]",,"66","Orlene Abundo","Orlene Abundo","0"
+"C&D Skills Matrix","2 - Important","[""Automation""]","In progress","Sushmitha Singh",,"False","N/A","[""CLX Innovation Center""]",,"68","Sushmitha Singh","Mon Blaza","1"
+"DITA-to-MD Converter","1 - Urgent","[""Automation""]","Testing","Mon Blaza","Matt Briggs;Claude Trono","False","2026 S5 (June 2 - June 23)","[""CLX Innovation Center""]","100%","34","Mon Blaza","Jed Ortega","0"
+"AEO/GEO","1 - Urgent","[""Search Optimization"",""Standards/Style Guide""]","For review","Mon Blaza;Elaine Stott","Ray Carlo Abacan;Mon Blaza;Elaine Stott;Bert Niverba","False","2026 S5 (June 2 - June 23)","[""CLX Innovation Center""]","70%","44","Mon Blaza","Jed Ortega","0"
+"ArchiSnapper Translation Needs","1 - Urgent","[""Automation"",""GenAI""]","In progress","Elaine Stott","Claude Trono","False","2026 S5 (June 2 - June 23)","[""CLX Innovation Center""]","60%","58","Elaine Stott","Jed Ortega","1"
+"Markdown Validator","1 - Urgent","[""Automation""]","Approved","Vincent Bautista","Vincent Bautista;Matt Briggs;Mon Blaza","True","2026 S5 (June 2 - June 23)","[""CLX Innovation Center""]","100%","67","Vincent Bautista","Jed Ortega","0"
+"Training and Development Curriculum","2 - Important","[""Automation""]","In progress","Sushmitha Singh",,"False","N/A","[""CLX Innovation Center""]",,"69","Sushmitha Singh","Mon Blaza","1"
+"AI Workflows (CM/SME)","2 - Important","[""Data Management""]","In progress","Jed Ortega","Jed Ortega;Jennifer Carr;Mon Blaza;Bert Niverba","False","N/A","[""CLX Innovation Center""]","75%","70","Jed Ortega","Mon Blaza","0"
+"Innovation Dashboard","2 - Important","[""Data Management""]","For review","Jed Ortega","Jed Ortega","False","N/A","[""CLX Innovation Center""]","100%","71","Jed Ortega","Mon Blaza","0"
+"AI Documentation Planner","3 - Medium","[""Authoring Tool""]","In progress","Matt Briggs",,"False","N/A","[""CLX Innovation Center""]","65%","72","Matt Briggs","Matt Briggs","0"
+"IAG Development Assistant","3 - Medium","[""Agent""]","In progress","Karen Denise Kalaw;Bert Niverba","Bert Niverba","False","N/A","[""CLX Innovation Center""]",,"73","Bert Niverba","Bert Niverba","0"
+"Smartsheet Trackers Overhaul (MS List, Automations & Dashboard)","1 - Urgent","[""Data Management"",""Automation""]","In progress","Jed Ortega","Remil Hizon;Jenny Dollente;Mon Blaza;Ketch Pablo","False","2026 S5 (June 2 - June 23)","[""CLX Innovation Center""]",,"74","Jed Ortega","Jed Ortega","0"
+"Markdown MegaBundle Processing Tool","1 - Urgent","[""Automation""]","For review","Mon Blaza","Mon Blaza","False","N/A","[""CLX Innovation Center""]","100%","75","Mon Blaza","Mon Blaza","1"
+"TS to article converter Agent","2 - Important","[""Agent""]","For demo with leadership","Pete Daryl Lapuz","Kim Adriano;Bert Niverba","False","N/A","[""CLX Innovation Center""]","100%","76","Pete Daryl Lapuz","Pete Daryl Lapuz","0"
+"Customer Enablement Content Planning Assistant","2 - Important","[""Agent""]","Testing","Anna Dixon","Anna Dixon","False","N/A","[""CLX Innovation Center""]","85%","77","Anna Dixon","Anna Dixon","0"
+"Customer Enablement Content Builder Assistant","2 - Important","[""Agent""]","In progress","Anna Dixon","Anna Dixon","False","N/A","[""CLX Innovation Center""]","25%","78","Anna Dixon","Anna Dixon","0"
+"MD File Bulk Packager","2 - Important","[""Automation""]","For demo with leadership","Ray Carlo Abacan",,"False","N/A","[""CLX Innovation Center""]",,"79","Ray Carlo Abacan","Ray Carlo Abacan","0"
