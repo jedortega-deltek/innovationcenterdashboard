@@ -46,9 +46,9 @@ To generate Excel reports:
 1. Download the generator .exe file.
 2. Export a Costpoint maintenance release query from TFS in CSV format and save it locally.
 3. Run the executable:
-    a. Double-click the executable to open it.
-    b. When prompted, enter the version number and click Generate Excel.
-    c. Select the CSV file containing the MR query data.","https://delteko365.sharepoint.com/:u:/s/CDSInnovationCenter/EZA7nICJxTREgs_no1W1mYUB57Tc8sxL_Pa0QZeOdx0txg?e=UPJ9Ue","Reserved_ImageAttachment_[5]_[Image][32]_[4aed8211f3a44f6e856ea14058887f5b][1]_[1].png",,,,,"Automation","10","10/19/2025 11:17 PM","Mon Blaza","Mon Blaza"
+    a. Double-click the executable to open it.
+    b. When prompted, enter the version number and click Generate Excel.
+    c. Select the CSV file containing the MR query data.","https://delteko365.sharepoint.com/:u:/s/CDSInnovationCenter/EZA7nICJxTREgs_no1W1mYUB57Tc8sxL_Pa0QZeOdx0txg?e=UPJ9Ue","Reserved_ImageAttachment_[5]_[Image][32]_[4aed8211f3a44f6e856ea14058887f5b][1]_[1].png",,,,,"Automation","10","10/19/2025 11:17 PM","Mon Blaza","Mon Blaza"
 "Release Notes Python Script","This tool aims to automate the generation of release notes and works hand-in-hand with the Release Notes GenAI tool.",,"Reserved_ImageAttachment_[5]_[Image][32]_[dd4e81c843014f0c8a959604193608a7][1]_[1].png","<b>December 2025</b> - Updated to&#160;<span style=""font-family&#58;Calibri, Arial, Helvetica, sans-serif;text-align&#58;left;background-color&#58;rgb(255, 255, 255);display&#58;inline !important;"">generate another type of output, Markdown, in support of our Shift to Markdown initiative.</span>",,,"Sylvia Siguenza;Claude Trono","Automation","11","10/19/2025 11:27 PM","Mon Blaza","Jed Ortega"
 "Word-to-Markdown Converter","A toolkit for converting Word documents to Markdown so they can be easily ingested and consumable via the Deltek Learning Hub.
 
