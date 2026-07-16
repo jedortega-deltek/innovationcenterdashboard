@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CE Innovation Center</title>
+
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+<style>
+  html,body{margin:0;background:#FCFDFF;font-family:'Figtree',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#3C454E;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
+  *{box-sizing:border-box;}
+  a{color:#1742F5;text-decoration:none;}
+  a:hover{text-decoration:underline;text-underline-offset:3px;}
+  ::placeholder{color:#9AA3AE;}
+  input:focus{outline:none;border-color:#1742F5 !important;box-shadow:0 0 0 3px rgba(23,66,245,.14);}
+  .clamp2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .wordmark svg{height:22px;width:auto;display:block;}
+  .chip{transition:border-color .18s,box-shadow .18s,transform .18s;}
+  .chip:hover{border-color:#C9D2F7 !important;box-shadow:0 6px 16px rgba(0,2,29,.10);transform:translateY(-1px);}
+  .card-hover{transition:border-color .2s,box-shadow .2s;}
+  .card-hover:hover{border-color:#D5DAE6 !important;box-shadow:0 8px 24px rgba(0,2,29,.08);}
+  .listrow:hover{border-color:#C9D2F7 !important;background:#FCFDFF;}
+  .primary-btn{transition:background .18s;}
+  .primary-btn:hover{background:#0E33CC !important;}
+  .navlink{transition:background .15s;border-radius:8px;}
+  .navlink:hover{background:#F2F4F9;text-decoration:none;}
+  .trow:hover{background:#FCFDFF;}
+  .iconbtn:hover{background:#F2F4F9 !important;color:#00021D !important;}
+  ::-webkit-scrollbar{width:10px;height:10px;}
+  ::-webkit-scrollbar-thumb{background:#D5DAE6;border-radius:999px;border:2px solid #FCFDFF;}
+</style>
+
+<script type="importmap">
+{
+  "imports": {
+    "react":             "https://esm.sh/react@18.3.1",
+    "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
+    "react-dom/client":  "https://esm.sh/react-dom@18.3.1/client",
+    "lucide-react":      "https://esm.sh/lucide-react@0.383.0?deps=react@18.3.1",
+    "papaparse":         "https://esm.sh/papaparse@5.4.1"
+  }
+}
+</script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" data-type="module" data-presets="react">
+import React, { useState, useEffect } from 'react';
+import { createRoot } from 'react-dom/client';
+import Papa from 'papaparse';
+import { CheckCircle2, Calendar, Search, X, ArrowUpRight, ListChecks, User, ChevronDown, ArrowUp, ArrowDown, ArrowUpDown, Loader2, AlertCircle } from 'lucide-react';
+
+/* ============================================================
+   CONFIG — relative CSV paths (same as the source repo)
+   ============================================================ */
+const CSV_URLS = {
+  approvedInnovations: './Approved Innovations.csv',
+  promptLibrary:       './CLX AI Prompt Library.csv',
+  shareYourProject:    './Share your project.csv',
+  workItems:           './Work Items.csv',
+};
+
+const WORDMARK_SVG = "<svg width=\"121.84\" height=\"31.08\" viewBox=\"0 0 121.84 31.08\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" overflow=\"visible\"><defs></defs><g><g><path d=\"M42.07 25.92C41.16 26.51 40.01 26.8 38.61 26.8 37.4 26.8 36.29 26.54 35.29 26.03 34.29 25.52 33.48 24.78 32.88 23.82 32.37 23.01 32.09 22.07 32.01 21.01L49.18 21.01C49.18 18.44 48.7 16.23 47.75 14.37 46.79 12.51 45.5 11.09 43.86 10.11 42.22 9.12 40.38 8.63 38.35 8.63 36.1 8.63 34.11 9.11 32.36 10.06 30.61 11.02 29.24 12.34 28.24 14.02 27.24 15.71 26.74 17.65 26.74 19.84 26.74 22.04 27.23 23.98 28.22 25.66 29.21 27.35 30.56 28.67 32.27 29.62 33.98 30.58 35.95 31.05 38.17 31.05 39.9 31.05 41.44 30.82 42.79 30.36 44.14 29.9 45.31 29.25 46.3 28.39 47.29 27.53 48.1 26.53 48.74 25.39L44.23 23.59C43.69 24.57 42.98 25.33 42.07 25.92ZM33.19 15.04C33.8 14.28 34.56 13.71 35.47 13.33 36.38 12.94 37.29 12.75 38.2 12.75 39.11 12.75 39.98 12.94 40.82 13.33 41.65 13.72 42.34 14.29 42.89 15.04 43.34 15.66 43.59 16.43 43.67 17.33L32.32 17.33C32.41 16.43 32.69 15.66 33.19 15.04Z\" fill=\"#1742F5\"></path><path d=\"M51.03 30.55 51.03 0.01 55.92 0.01 55.92 30.56 51.03 30.56Z\" fill=\"#1742F5\"></path><path d=\"M72.08 25.75C71.64 26.07 71.25 26.29 70.9 26.4 70.55 26.52 70.23 26.57 69.94 26.57 69.01 26.57 68.3 26.31 67.82 25.78 67.34 25.26 67.1 24.49 67.1 23.47L67.1 12.92 73 12.92 73 8.73 67.11 8.73 67.11 1.93 62.27 1.93 62.27 8.74 58.65 8.74 58.65 12.93 62.27 12.93 62.27 24.4C62.27 26.55 62.87 28.2 64.08 29.35 65.29 30.5 67.04 31.07 69.34 31.07 70.1 31.07 70.85 30.93 71.61 30.66 72.37 30.38 73.12 29.98 73.88 29.46L72.08 25.75Z\" fill=\"#1742F5\"></path><path d=\"M89.73 25.92C88.82 26.51 87.67 26.8 86.27 26.8 85.06 26.8 83.95 26.54 82.95 26.03 81.95 25.52 81.14 24.78 80.54 23.82 80.03 23.01 79.75 22.07 79.67 21.01L96.84 21.01C96.84 18.44 96.36 16.23 95.41 14.37 94.45 12.51 93.16 11.09 91.52 10.11 89.88 9.12 88.04 8.63 86.01 8.63 83.76 8.63 81.77 9.11 80.02 10.06 78.27 11.02 76.9 12.34 75.9 14.02 74.9 15.71 74.4 17.65 74.4 19.84 74.4 22.04 74.89 23.98 75.88 25.66 76.87 27.35 78.22 28.67 79.93 29.62 81.64 30.58 83.61 31.05 85.83 31.05 87.56 31.05 89.1 30.82 90.45 30.36 91.8 29.9 92.97 29.25 93.96 28.39 94.95 27.53 95.76 26.53 96.4 25.39L91.89 23.59C91.35 24.57 90.64 25.33 89.73 25.92ZM80.85 15.04C81.46 14.28 82.22 13.71 83.13 13.33 84.04 12.94 84.95 12.75 85.86 12.75 86.77 12.75 87.64 12.94 88.48 13.33 89.31 13.72 90 14.29 90.55 15.04 91 15.66 91.25 16.43 91.33 17.33L79.98 17.33C80.07 16.43 80.35 15.66 80.85 15.04Z\" fill=\"#1742F5\"></path><path d=\"M112.79 30.55 118.59 30.55 109.64 17.77 117.85 8.73 111.96 8.73 103.8 17.62 103.8 0.01 98.91 0.01 98.91 30.55 103.8 30.55 103.8 24.2 106.47 21.26Z\" fill=\"#1742F5\"></path><g><circle cx=\"2.54\" cy=\"21.44\" r=\"2.54\" fill=\"#1742F5\"></circle><path d=\"M23.03 7.33C21.71 5.03 19.89 3.24 17.57 1.94 15.27 0.65 12.61 0 9.62 0L2.77 0C1.29 0 0.09 1.17 0.01 2.63L0.01 17.89C0.72 17.38 1.59 17.08 2.53 17.08 3.48 17.08 4.35 17.39 5.07 17.9L5.07 4.71 9.61 4.71C11.04 4.71 12.37 4.98 13.62 5.52 14.87 6.06 15.96 6.81 16.89 7.77 17.82 8.73 18.55 9.85 19.07 11.13 19.59 12.41 19.86 13.79 19.86 15.28 19.86 16.76 19.6 18.15 19.07 19.43 18.55 20.71 17.82 21.83 16.89 22.79 15.96 23.75 14.87 24.5 13.62 25.04 12.37 25.58 11.03 25.85 9.61 25.85L5.08 25.85 2.4 25.85C2.39 25.85 2.37 25.85 2.36 25.85 1.06 25.83 0 26.89 0 28.19 0 29.5 1.06 30.55 2.36 30.55 2.39 30.55 2.43 30.54 2.46 30.54L9.61 30.54C12.61 30.54 15.26 29.89 17.57 28.58 19.88 27.27 21.7 25.47 23.03 23.17 24.35 20.87 25.02 18.24 25.02 15.27 25.02 12.28 24.36 9.63 23.03 7.33Z\" fill=\"#1742F5\"></path></g><g><path d=\"M120.59 30.78C120.42 30.78 120.26 30.75 120.11 30.68 119.96 30.62 119.83 30.53 119.71 30.41 119.6 30.3 119.51 30.16 119.44 30.01 119.38 29.86 119.34 29.7 119.34 29.53 119.34 29.36 119.37 29.19 119.44 29.04 119.5 28.89 119.59 28.76 119.71 28.64 119.82 28.53 119.96 28.44 120.11 28.37 120.26 28.3 120.42 28.27 120.59 28.27 120.76 28.27 120.93 28.3 121.08 28.37 121.23 28.44 121.36 28.52 121.48 28.64 121.6 28.76 121.68 28.88 121.75 29.04 121.82 29.19 121.85 29.35 121.85 29.53 121.85 29.7 121.82 29.86 121.75 30.01 121.68 30.16 121.6 30.29 121.48 30.41 121.36 30.53 121.24 30.61 121.08 30.68 120.92 30.75 120.77 30.78 120.59 30.78ZM120.59 30.51C120.78 30.51 120.95 30.47 121.1 30.39 121.24 30.31 121.36 30.19 121.44 30.04 121.52 29.89 121.56 29.72 121.56 29.53 121.56 29.33 121.52 29.16 121.44 29.02 121.36 28.87 121.24 28.76 121.1 28.68 120.96 28.6 120.79 28.56 120.59 28.56 120.4 28.56 120.23 28.6 120.09 28.68 119.95 28.76 119.83 28.88 119.75 29.02 119.67 29.17 119.63 29.34 119.63 29.53 119.63 29.72 119.67 29.89 119.75 30.04 119.83 30.19 119.95 30.3 120.09 30.39 120.24 30.47 120.4 30.51 120.59 30.51ZM120.13 30.18 120.13 28.84 120.62 28.84C120.76 28.84 120.87 28.88 120.96 28.96 121.05 29.04 121.09 29.14 121.09 29.27 121.09 29.36 121.07 29.43 121.02 29.5 120.97 29.57 120.91 29.62 120.83 29.66L121.14 30.18 120.85 30.18 120.58 29.7 120.37 29.7 120.37 30.18 120.13 30.18ZM120.38 29.47 120.62 29.47C120.68 29.47 120.73 29.45 120.77 29.42 120.81 29.39 120.83 29.34 120.83 29.28 120.83 29.22 120.81 29.17 120.77 29.14 120.73 29.1 120.67 29.09 120.61 29.09L120.38 29.09 120.38 29.47Z\" fill=\"#1742F5\"></path></g></g></g></svg>";
+
+/* ---------- Deltek palette ---------- */
+const C = {
+  marine:'#1742F5', navy:'#070D63', ink:'#00021D', body:'#3C454E', muted:'#6B7683',
+  faint:'#9AA3AE', border:'#EDEFF5', borderStrong:'#D5DAE6', bg:'#FCFDFF', white:'#fff', hairline:'#F2F4F9',
+};
+const TYPE_COLOR = {
+  'Prompt':'#6D18F1','Automation':'#1742F5','Copilot Agent':'#3895FF',
+  'GenAI Plug-in for ADO/TFS':'#00B6C3','Workflow & Tracking Solutions':'#C200CC',
+  'Authoring Tool':'#070D63','SharePoint Site':'#7A62FF','Repository/Storage':'#94A3B8',
+};
+const FALLBACK = ['#1742F5','#6D18F1','#3895FF','#00B6C3','#C200CC','#7A62FF','#0B5FD6','#067A83','#94A3B8'];
+const hashStr = (s)=>{let h=0;s=String(s);for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0;}return Math.abs(h);};
+const colorForType = (t)=> TYPE_COLOR[t] || FALLBACK[hashStr(t)%FALLBACK.length];
+
+const pillFor = (p)=>{
+  const s=String(p).toLowerCase();
+  if(s==='for review') return {bg:'rgba(0,182,195,.14)',color:'#067A83'};
+  if(s==='in progress'||s==='active') return {bg:'rgba(23,66,245,.10)',color:'#1742F5'};
+  if(s==='testing') return {bg:'rgba(109,24,241,.12)',color:'#6D18F1'};
+  if(s==='completed'||s==='done'||s==='closed') return {bg:'rgba(0,182,195,.14)',color:'#067A83'};
+  if(s==='not started'||s==='to do'||s==='new') return {bg:'#EDEFF5',color:'#5B6472'};
+  if(s==='on hold') return {bg:'rgba(194,0,204,.10)',color:'#A800B0'};
+  if(s.indexOf('demo')>=0) return {bg:'rgba(194,0,204,.10)',color:'#A800B0'};
+  return {bg:'#EDEFF5',color:'#5B6472'};
+};
+const barColorFor = (pct)=> pct>=100 ? '#00B6C3' : '#1742F5';
+const AV = [
+  {bg:'rgba(23,66,245,.12)',color:'#1742F5'},{bg:'rgba(109,24,241,.12)',color:'#6D18F1'},
+  {bg:'rgba(0,182,195,.16)',color:'#067A83'},{bg:'rgba(56,149,255,.16)',color:'#0B5FD6'},
+];
+const initialsOf = (name)=>{const p=String(name).trim().split(/\s+/);return (((p[0]||'')[0]||'')+((p[1]||'')[0]||'')).toUpperCase();};
+const peopleOf = (expert)=> String(expert||'').split(';').map(x=>x.trim()).filter(Boolean);
+const expertLabelOf = (people)=> people.length===0?'Unassigned':(people.length===1?people[0]:people[0].split(/\s+/)[0]+' +'+(people.length-1));
+
+const EYEBROW = {fontSize:11,fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',margin:0};
+const CARD = {background:C.white,border:'1px solid '+C.border,borderRadius:16};
+
+const Dashboard = () => {
+  const [loading,setLoading]=useState(true);
+  const [error,setError]=useState(null);
+  const [approved,setApproved]=useState([]);
+  const [prompts,setPrompts]=useState([]);
+  const [active,setActive]=useState([]);
+  const [allProjects,setAllProjects]=useState([]);
+  const [workItems,setWorkItems]=useState([]);
+  const [query,setQuery]=useState('');
+  const [sortConfig,setSortConfig]=useState({key:'percent',direction:'desc'});
+  const [selectedSprintFilter,setSelectedSprintFilter]=useState(null);
+  const [modal,setModal]=useState(null); // {kind:'type'|'approved'|'kpi'|'sprint', ...}
+
+  /* ---------- helpers ---------- */
+  const cleanValue=(v)=>{
+    if(v===null||v===undefined||v==='')return '';
+    if(typeof v==='number'||typeof v==='boolean')return v;
+    if(Array.isArray(v))return v.map(cleanValue).filter(Boolean).join(', ');
+    if(typeof v==='object'){
+      if(v.Value!==undefined)return cleanValue(v.Value);
+      if(v.DisplayName!==undefined)return cleanValue(v.DisplayName);
+      if(v.results&&Array.isArray(v.results))return v.results.map(cleanValue).filter(Boolean).join(', ');
+      return '';
+    }
+    const s=String(v).trim();
+    if((s.startsWith('{')&&s.endsWith('}'))||(s.startsWith('[')&&s.endsWith(']'))){
+      try{return cleanValue(JSON.parse(s));}catch(e){
+        const m=s.match(/"Value"\s*:\s*"([^"]+)"/); if(m)return m[1];
+        const n=s.match(/"DisplayName"\s*:\s*"([^"]+)"/); if(n)return n[1];
+        return s;
+      }
+    }
+    return s;
+  };
+  const getField=(row,...keys)=>{for(const k of keys){if(row[k]!==undefined&&row[k]!==null&&row[k]!=='')return cleanValue(row[k]);}return '';};
+  const normalizePercent=(v)=>{if(v===null||v===undefined||v==='')return 0;let n=typeof v==='number'?v:parseFloat(String(v).replace('%','').trim());if(isNaN(n))return 0;if(n>0&&n<=1)n=n*100;return Math.max(0,Math.min(100,Math.round(n)));};
+  const stripHtml=(raw)=>{
+    if(raw===null||raw===undefined)return '';
+    let s=String(raw);
+    s=s.replace(/<\s*(br|\/p|\/div|\/li|\/h[1-6])\s*\/?>/gi,'\n').replace(/<[^>]+>/g,'');
+    const ent={'&nbsp;':' ','&amp;':'&','&lt;':'<','&gt;':'>','&quot;':'"','&#39;':"'",'&apos;':"'",'&rsquo;':'\u2019','&lsquo;':'\u2018','&rdquo;':'\u201D','&ldquo;':'\u201C','&mdash;':'\u2014','&ndash;':'\u2013','&hellip;':'\u2026'};
+    s=s.replace(/&[a-z#0-9]+;/gi,(m)=>{if(ent[m.toLowerCase()]!==undefined)return ent[m.toLowerCase()];const num=m.match(/^&#(\d+);$/);if(num){try{return String.fromCharCode(parseInt(num[1],10));}catch(e){return '';}}return '';});
+    return s.replace(/[ \t]+/g,' ').replace(/\n{3,}/g,'\n\n').trim();
+  };
+
+  /* ---------- load ---------- */
+  useEffect(()=>{
+    const parseFile=(url,label)=>new Promise(async(resolve,reject)=>{
+      try{
+        const cb=(url.includes('?')?'&':'?')+'t='+Date.now();
+        const res=await fetch(url+cb);
+        if(!res.ok)throw new Error('HTTP '+res.status+' while fetching '+label);
+        const text=await res.text();
+        Papa.parse(text,{header:true,dynamicTyping:true,skipEmptyLines:true,transformHeader:(h)=>h.trim(),complete:(r)=>resolve(r.data),error:reject});
+      }catch(err){reject(err);}
+    });
+    (async()=>{
+      try{
+        const [ar,pr,acr,wr]=await Promise.all([
+          parseFile(CSV_URLS.approvedInnovations,'Approved Innovations'),
+          parseFile(CSV_URLS.promptLibrary,'Prompt Library'),
+          parseFile(CSV_URLS.shareYourProject,'Share Your Project'),
+          parseFile(CSV_URLS.workItems,'Work Items'),
+        ]);
+        const approvedClean=ar.filter(r=>r&&getField(r,'Title')).map(r=>({title:getField(r,'Title'),solutionType:getField(r,'Solution Type','SolutionType')||'Other',id:getField(r,'ID')}));
+        const promptClean=pr.filter(r=>r&&getField(r,'Title')).map(r=>({title:getField(r,'Title'),solutionType:'Prompt'}));
+        const allProjectsClean=acr.filter(r=>r&&getField(r,'Title')).map(r=>{
+          const archive=r['Archive']; const archiveStr=String(cleanValue(archive)).toLowerCase().trim();
+          return {
+            title:getField(r,'Title'), status:getField(r,'Status'), progress:getField(r,'Progress'),
+            priority:getField(r,'Priority'), sprint:getField(r,'Sprint'), archive, archiveStr,
+            expert:getField(r,'Innovation Expert/Partner','AIExpert_x002f_Partner','Innovation Expert','AI Expert/Partner'),
+            percent:normalizePercent(getField(r,'% Completion','OData__x0025__x0020_Completion','Percent Complete')),
+            solutionType:getField(r,'Solution Type','SolutionType'),
+          };
+        });
+        const activeClean=allProjectsClean.filter(row=>{
+          const s=String(row.status).toLowerCase(), p=String(row.progress).toLowerCase(), a=row.archiveStr;
+          if(s==='approved'||s==='archived'||p==='approved'||p==='archived')return false;
+          if(a==='approved'||a==='archived'||a==='yes'||a==='true'||a==='y'||a==='1'||a==='checked')return false;
+          return true;
+        });
+        const workItemsClean=wr.filter(r=>r&&(getField(r,'Title')||getField(r,'Project'))).map(r=>({
+          project:getField(r,'Project'), itemType:getField(r,'Item Type','ItemType'), title:getField(r,'Title'),
+          description:stripHtml(getField(r,'Description')), assignedTo:getField(r,'Assigned To','AssignedTo'),
+          status:getField(r,'Status'), percent:normalizePercent(getField(r,'% Complete','Percent Complete','PercentComplete')), priority:getField(r,'Priority'),
+        }));
+        setApproved(approvedClean); setPrompts(promptClean); setAllProjects(allProjectsClean); setActive(activeClean); setWorkItems(workItemsClean);
+        setLoading(false);
+      }catch(err){console.error(err);setError(err.message||'Failed to load data');setLoading(false);}
+    })();
+  },[]);
+
+  /* ---------- derived ---------- */
+  const completedAll=[...approved,...prompts];
+  const totalCompleted=completedAll.length;
+  const typeCounts=completedAll.reduce((a,it)=>{const t=it.solutionType||'Other';a[t]=(a[t]||0)+1;return a;},{});
+  const typeSegments=Object.entries(typeCounts).sort((a,b)=>b[1]-a[1]).map(([type,count])=>({type,count,color:colorForType(type),width:totalCompleted?(count/totalCompleted*100):0}));
+
+  const pipelineCount=active.filter(r=>String(r.progress).toLowerCase()==='not started').length;
+  const inProgressCount=active.filter(r=>{const p=String(r.progress).toLowerCase();return p&&p!=='approved'&&p!=='on hold'&&p!=='not started';}).length;
+
+  const availableSprints=Array.from(new Set(allProjects.map(r=>String(r.sprint).trim()).filter(s=>{if(!s)return false;const v=s.toLowerCase();return !['n/a','na','none','tbd','-'].includes(v);}))).sort((a,b)=>{
+    const pk=(s)=>{const m=s.match(/^(\d{4})\s+S(\d+)/i);return m?[parseInt(m[1],10),parseInt(m[2],10)]:[0,0];};
+    const[ay,an]=pk(a),[by,bn]=pk(b); if(ay!==by)return by-ay; return bn-an;
+  });
+  const activeSprintFilter = (selectedSprintFilter&&availableSprints.includes(selectedSprintFilter)) ? selectedSprintFilter : (availableSprints[0]||'');
+  const sprintItems=allProjects.filter(r=>String(r.sprint).trim()===activeSprintFilter).sort((a,b)=>b.percent-a.percent);
+
+  const sortedActive=[...active].filter(r=>String(r.progress).toLowerCase()!=='on hold').sort((a,b)=>{
+    const {key,direction}=sortConfig; const dir=direction==='asc'?1:-1;
+    if(key==='percent')return ((a.percent||0)-(b.percent||0))*dir;
+    const av=String(a[key==='expert'?'expert':key]||'').toLowerCase(), bv=String(b[key==='expert'?'expert':key]||'').toLowerCase();
+    return av<bv?-1*dir:av>bv?1*dir:0;
+  });
+  const q=query.trim().toLowerCase();
+  const filteredActive=q?sortedActive.filter(it=>[it.title,it.expert,it.progress].map(v=>String(v||'').toLowerCase()).join(' | ').includes(q)):sortedActive;
+  const allActiveCount=sortedActive.length;
+
+  const handleSort=(key)=>setSortConfig(prev=>prev.key===key?{key,direction:prev.direction==='asc'?'desc':'asc'}:{key,direction:key==='percent'?'desc':'asc'});
+  const SortIcon=({k})=>{if(sortConfig.key!==k)return <ArrowUpDown size={13} style={{color:C.faint}}/>;return sortConfig.direction==='asc'?<ArrowUp size={13} style={{color:C.marine}}/>:<ArrowDown size={13} style={{color:C.marine}}/>;};
+
+  const showcaseUrl=(id)=>id!==undefined&&id!==null&&id!==''?('https://delteko365.sharepoint.com/sites/CustomerLearningExperience/Lists/Showcase/DispForm.aspx?ID='+id):null;
+  const PROMPT_URL='https://delteko365.sharepoint.com/sites/CustomerLearningExperience/Lists/CLX%20Prompt%20Library/AllItems.aspx';
+
+  /* ---------- avatars ---------- */
+  const Avatars=({expert})=>{
+    const ppl=peopleOf(expert);
+    return (
+      <div style={{display:'flex',alignItems:'center',gap:6}}>
+        {ppl.slice(0,3).map((n,i)=>{const a=AV[hashStr(n)%AV.length];return <span key={i} style={{width:26,height:26,borderRadius:999,background:a.bg,color:a.color,fontSize:10,fontWeight:700,display:'flex',alignItems:'center',justifyContent:'center',border:'1.5px solid #fff',marginLeft:i?-6:0}}>{initialsOf(n)}</span>;})}
+        <span style={{fontSize:12,color:C.muted,marginLeft:4}}>{expertLabelOf(ppl)}</span>
+      </div>
+    );
+  };
+  const Bar=({pct,h=6})=> <div style={{height:h,borderRadius:999,background:C.border,overflow:'hidden'}}><div style={{height:'100%',borderRadius:999,background:barColorFor(pct),width:pct+'%'}}/></div>;
+
+  /* ---------- loading / error ---------- */
+  if(loading) return (
+    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center'}}>
+      <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:14,color:C.muted}}>
+        <Loader2 size={38} style={{color:C.marine,animation:'spin 1s linear infinite'}}/>
+        <style>{'@keyframes spin{to{transform:rotate(360deg)}}'}</style>
+        <p style={{fontSize:14,fontWeight:600,margin:0}}>Loading innovation data…</p>
+      </div>
+    </div>
+  );
+  if(error) return (
+    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',padding:24}}>
+      <div style={{...CARD,maxWidth:460,padding:24,borderColor:'#F3C9CE'}}>
+        <div style={{display:'flex',gap:12}}>
+          <AlertCircle size={22} style={{color:'#C200CC',flexShrink:0,marginTop:2}}/>
+          <div>
+            <h3 style={{fontSize:16,fontWeight:700,color:C.ink,margin:0}}>Couldn't load data</h3>
+            <p style={{fontSize:14,color:C.body,margin:'6px 0 0'}}>{error}</p>
+            <p style={{fontSize:12,color:C.faint,margin:'12px 0 0'}}>Make sure the four CSV files sit alongside this HTML file (same folder) and it is served over http/https, not opened from the file system.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  /* ---------- modal content ---------- */
+  const closeModal=()=>setModal(null);
+  const renderModal=()=>{
+    if(!modal)return null;
+    let maxW='640px', eyebrow='', title='', subtitle='', bodyEl=null;
+
+    const listLayout=(items,withType)=> (
+      <div style={{display:'flex',flexDirection:'column',gap:8}}>
+        {items.length===0 ? <p style={{fontSize:14,color:C.faint,textAlign:'center',padding:'24px 0'}}>No items in this category.</p> :
+          items.map((it,i)=>{
+            const inner=(<>
+              <span style={{flexShrink:0,width:24,height:24,borderRadius:999,background:'rgba(23,66,245,.10)',color:C.marine,fontSize:12,fontWeight:800,display:'flex',alignItems:'center',justifyContent:'center',marginTop:1}}>{i+1}</span>
+              <span style={{flex:1,minWidth:0}}>
+                <span style={{display:'block',fontSize:14,fontWeight:600,color:C.ink,lineHeight:1.4}}>{it.title}</span>
+                {withType&&<span style={{display:'inline-flex',alignItems:'center',gap:6,marginTop:5}}><span style={{width:8,height:8,borderRadius:2,background:colorForType(it.type)}}/><span style={{fontSize:11,fontWeight:600,letterSpacing:'.03em',textTransform:'uppercase',color:C.muted}}>{it.type}</span></span>}
+              </span>
+              {it.url&&<ArrowUpRight size={15} style={{flexShrink:0,color:C.faint,marginTop:3}}/>}
+            </>);
+            const st={display:'flex',alignItems:'flex-start',gap:12,padding:'12px 14px',border:'1px solid '+C.border,borderRadius:10,textDecoration:'none'};
+            return it.url
+              ? <a key={i} className="listrow" href={it.url} target="_blank" rel="noopener noreferrer" style={st}>{inner}</a>
+              : <div key={i} style={st}>{inner}</div>;
+          })}
+      </div>
+    );
+
+    if(modal.kind==='type'){
+      const items=completedAll.filter(x=>(x.solutionType||'Other')===modal.type).map(x=>({title:x.title,url:x.solutionType==='Prompt'?PROMPT_URL:showcaseUrl(x.id)}));
+      eyebrow='Solution Type'; title=modal.type; subtitle=items.length+(items.length===1?' approved innovation':' approved innovations');
+      bodyEl=listLayout(items,false);
+    } else if(modal.kind==='approved'){
+      const items=completedAll.map(x=>({title:x.title,type:x.solutionType||'Other',url:x.solutionType==='Prompt'?PROMPT_URL:showcaseUrl(x.id)}));
+      maxW='680px'; eyebrow='Approved'; title='Completed Innovations'; subtitle=items.length+' approved innovations';
+      bodyEl=listLayout(items,true);
+    } else if(modal.kind==='kpi'){
+      const isPipe=modal.which==='pipeline';
+      const items=active.filter(r=>{const p=String(r.progress).toLowerCase();return isPipe?p==='not started':(p&&p!=='approved'&&p!=='on hold'&&p!=='not started');}).sort((a,b)=>b.percent-a.percent);
+      maxW='760px'; eyebrow=isPipe?'Pipeline':'In Progress'; title=eyebrow; subtitle=items.length+' projects · '+(isPipe?'not yet started':'actively underway');
+      bodyEl=(
+        <table style={{width:'100%',borderCollapse:'collapse',fontSize:14}}>
+          <thead><tr style={{borderBottom:'1px solid '+C.border}}>
+            {['Project','Expert','Status','Completion'].map((h,i)=><th key={h} style={{textAlign:'left',padding:i===0?'10px 12px 10px 0':(i===3?'10px 0 10px 12px':'10px 12px'),...EYEBROW,color:C.muted,minWidth:i===3?130:'auto'}}>{h}</th>)}
+          </tr></thead>
+          <tbody>{items.map((r,i)=>{const pl=pillFor(r.progress);const ppl=peopleOf(r.expert);return (
+            <tr key={i} style={{borderBottom:'1px solid '+C.hairline}}>
+              <td style={{padding:'12px 12px 12px 0',fontWeight:600,color:C.ink,maxWidth:260}}>{r.title}</td>
+              <td style={{padding:12,color:C.body}}>{expertLabelOf(ppl)}</td>
+              <td style={{padding:12}}><span style={{display:'inline-block',fontSize:11,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',padding:'4px 10px',borderRadius:999,background:pl.bg,color:pl.color,whiteSpace:'nowrap'}}>{r.progress||'—'}</span></td>
+              <td style={{padding:'12px 0 12px 12px'}}><div style={{display:'flex',alignItems:'center',gap:10}}><div style={{flex:1,minWidth:60}}><Bar pct={r.percent}/></div><span style={{fontSize:13,fontWeight:700,color:C.ink,width:34,textAlign:'right'}}>{r.percent}%</span></div></td>
+            </tr>);})}</tbody>
+        </table>
+      );
+    } else if(modal.kind==='sprint'){
+      const it=modal.item; const ppl=peopleOf(it.expert);
+      maxW='620px'; eyebrow='Sprint Project'; title=it.title; subtitle='';
+      const detailRows=[
+        ['Innovation Expert',ppl.join(', ')||'Unassigned'],
+        ['Status',it.progress||'—'],['Priority',it.priority||'—'],
+        ['Sprint',it.sprint||'—'],['Solution Type',it.solutionType||'—'],
+      ];
+      const raw=workItems.filter(w=>String(w.project).trim().toLowerCase()===String(it.title).trim().toLowerCase());
+      const bucket=(w)=>{const s=String(w.status).toLowerCase(),t=String(w.itemType).toLowerCase();const done=s==='completed'||s==='done'||s==='closed';if(done&&t==='question/decision')return 'resolved';if(done)return 'completed';if(s==='not started'||s==='to do'||s==='new')return 'backlog';return 'inprogress';};
+      const defs={inprogress:{label:'In Progress',color:'#1742F5'},backlog:{label:'Backlog',color:'#94A3B8'},completed:{label:'Completed',color:'#00B6C3'},resolved:{label:'Resolved',color:'#6D18F1'}};
+      const order=['inprogress','backlog','completed','resolved'];
+      const b={inprogress:[],backlog:[],completed:[],resolved:[]}; raw.forEach(w=>b[bucket(w)].push(w));
+      const groups=order.filter(k=>b[k].length).map(k=>({...defs[k],items:b[k]}));
+      bodyEl=(
+        <div style={{display:'flex',flexDirection:'column',gap:20}}>
+          <div style={{background:C.bg,border:'1px solid '+C.border,borderRadius:12,padding:'18px 20px'}}>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12}}>
+              <span style={{...EYEBROW,color:C.muted}}>Completion</span>
+              <span style={{fontSize:22,fontWeight:800,color:C.ink}}>{it.percent}%</span>
+            </div>
+            <Bar pct={it.percent} h={8}/>
+          </div>
+          <div>{detailRows.map(([l,v])=>(
+            <div key={l} style={{display:'grid',gridTemplateColumns:'130px 1fr',gap:12,padding:'11px 0',borderBottom:'1px solid '+C.hairline}}>
+              <span style={{...EYEBROW,color:C.muted}}>{l}</span>
+              <span style={{fontSize:14,color:C.ink,fontWeight:500}}>{v}</span>
+            </div>))}
+          </div>
+          <div>
+            <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:14}}>
+              <ListChecks size={16} style={{color:C.marine}}/>
+              <h4 style={{fontSize:15,fontWeight:700,color:C.ink,margin:0}}>Work Items <span style={{color:C.faint,fontWeight:600}}>({raw.length})</span></h4>
+            </div>
+            {raw.length===0 ? <div style={{padding:20,textAlign:'center',fontSize:13,color:C.faint,background:C.bg,border:'1px solid '+C.border,borderRadius:10}}>No work items linked to this project yet.</div> :
+              <div style={{display:'flex',flexDirection:'column',gap:18}}>
+                {groups.map((g,gi)=>(
+                  <div key={gi}>
+                    <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:10}}>
+                      <span style={{width:8,height:8,borderRadius:999,background:g.color}}/>
+                      <span style={{...EYEBROW,color:C.body,fontSize:11}}>{g.label}</span>
+                      <span style={{fontSize:11,fontWeight:800,color:C.faint}}>{g.items.length}</span>
+                    </div>
+                    <div style={{display:'flex',flexDirection:'column',gap:8}}>
+                      {g.items.map((w,wi)=>{const pl=pillFor(w.status);return (
+                        <div key={wi} style={{border:'1px solid '+C.border,borderRadius:10,padding:'12px 14px'}}>
+                          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8,marginBottom:6,flexWrap:'wrap'}}>
+                            <div style={{display:'flex',alignItems:'center',gap:6,flexWrap:'wrap'}}>
+                              {w.itemType&&<span style={{fontSize:10,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',padding:'3px 8px',borderRadius:6,background:'rgba(23,66,245,.08)',color:C.marine}}>{w.itemType}</span>}
+                              {w.status&&<span style={{fontSize:10,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',padding:'3px 8px',borderRadius:999,background:pl.bg,color:pl.color}}>{w.status}</span>}
+                            </div>
+                            <span style={{fontSize:12,fontWeight:800,color:C.ink}}>{w.percent}%</span>
+                          </div>
+                          <p style={{fontSize:13,fontWeight:700,color:C.ink,margin:'0 0 3px',lineHeight:1.4}}>{w.title||'—'}</p>
+                          {w.description&&<p className="clamp2" style={{fontSize:12,color:C.muted,margin:0,lineHeight:1.5,whiteSpace:'pre-line'}}>{w.description}</p>}
+                          <div style={{display:'flex',alignItems:'center',gap:6,marginTop:8}}>
+                            <User size={12} style={{color:C.faint}}/>
+                            <span style={{fontSize:12,color:C.muted}}>{w.assignedTo||'Unassigned'}</span>
+                          </div>
+                        </div>);})}
+                    </div>
+                  </div>))}
+              </div>}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div onClick={closeModal} style={{position:'fixed',inset:0,zIndex:50,background:'rgba(7,13,99,.42)',backdropFilter:'blur(3px)',display:'flex',alignItems:'center',justifyContent:'center',padding:24}}>
+        <div onClick={e=>e.stopPropagation()} style={{...CARD,boxShadow:'0 24px 48px rgba(7,13,99,.24)',width:'100%',maxWidth:maxW,maxHeight:'86vh',display:'flex',flexDirection:'column',overflow:'hidden'}}>
+          <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:16,padding:'24px 28px',borderBottom:'1px solid '+C.border}}>
+            <div style={{minWidth:0}}>
+              <p style={{...EYEBROW,color:C.marine,marginBottom:5}}>{eyebrow}</p>
+              <h3 style={{fontSize:20,fontWeight:700,color:C.ink,margin:0,letterSpacing:'-0.01em',lineHeight:1.25}}>{title}</h3>
+              {subtitle&&<p style={{fontSize:13,color:C.muted,margin:'6px 0 0'}}>{subtitle}</p>}
+            </div>
+            <button className="iconbtn" onClick={closeModal} aria-label="Close" style={{flexShrink:0,background:'none',border:0,cursor:'pointer',color:C.faint,padding:6,borderRadius:8,display:'flex'}}><X size={20}/></button>
+          </div>
+          <div style={{padding:'20px 28px',overflowY:'auto'}}>{bodyEl}</div>
+          <div style={{padding:'16px 28px',borderTop:'1px solid '+C.border,background:C.bg,display:'flex',justifyContent:'flex-end'}}>
+            <button className="primary-btn" onClick={closeModal} style={{font:'inherit',fontSize:13,fontWeight:700,color:'#fff',background:C.marine,border:0,padding:'10px 20px',borderRadius:8,cursor:'pointer'}}>Close</button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  /* ---------- page ---------- */
+  const statCard=(label,value,sub,onClick,dark)=>{
+    const base={textAlign:'left',font:'inherit',borderRadius:16,padding:24,position:'relative',overflow:'hidden'};
+    const inner=(<>
+      <p style={{...EYEBROW,color:dark?'rgba(255,255,255,.72)':C.muted}}>{label}</p>
+      <p style={{fontSize:52,fontWeight:800,lineHeight:1,margin:'14px 0 6px',letterSpacing:'-0.02em',color:dark?'#fff':C.ink}}>{value}</p>
+      <p style={{fontSize:13,color:dark?'rgba(255,255,255,.72)':C.muted,margin:0}}>{sub}</p>
+      {dark&&<CheckCircle2 size={20} style={{position:'absolute',top:20,right:20,color:'rgba(255,255,255,.4)'}}/>}
+    </>);
+    if(onClick) return <button className={dark?'':'card-hover'} onClick={onClick} style={{...base,cursor:'pointer',background:dark?C.navy:C.white,border:dark?0:'1px solid '+C.border,color:dark?'#fff':'inherit'}}>{inner}</button>;
+    return <div style={{...base,background:dark?C.navy:C.white,border:dark?0:'1px solid '+C.border,color:dark?'#fff':'inherit'}}>{inner}</div>;
+  };
+
+  return (
+    <div style={{minHeight:'100vh',background:C.bg}}>
+      <header style={{position:'sticky',top:0,zIndex:30,background:'rgba(252,253,255,.86)',backdropFilter:'blur(10px)',borderBottom:'1px solid '+C.border}}>
+        <div style={{maxWidth:1240,margin:'0 auto',padding:'0 32px',height:64,display:'flex',alignItems:'center',justifyContent:'space-between',gap:24}}>
+          <div style={{display:'flex',alignItems:'center',gap:16,minWidth:0}}>
+            <span className="wordmark" style={{display:'inline-flex'}} dangerouslySetInnerHTML={{__html:WORDMARK_SVG}}/>
+            <span style={{width:1,height:24,background:'#DCE0EC'}}/>
+            <span style={{fontSize:15,fontWeight:700,color:C.ink,letterSpacing:'-0.01em',whiteSpace:'nowrap'}}>Innovation Center</span>
+          </div>
+          <nav style={{display:'flex',alignItems:'center',gap:8}}>
+            <a className="navlink" href="https://delteko365.sharepoint.com/sites/CustomerLearningExperience/SitePages/Innovation-Knowledge-Share.aspx" target="_blank" rel="noopener noreferrer" style={{fontSize:13,fontWeight:600,color:C.body,padding:'8px 12px'}}>In the Works</a>
+            <a className="navlink" href="https://delteko365.sharepoint.com/sites/CustomerLearningExperience/SitePages/Innovation-Showcase.aspx" target="_blank" rel="noopener noreferrer" style={{fontSize:13,fontWeight:600,color:C.body,padding:'8px 12px'}}>Showcase</a>
+            <a className="navlink" href="https://delteko365.sharepoint.com/sites/CustomerLearningExperience/Lists/CLX%20Prompt%20Library/AllItems.aspx" target="_blank" rel="noopener noreferrer" style={{fontSize:13,fontWeight:600,color:C.body,padding:'8px 12px'}}>Prompt Library</a>
+          </nav>
+        </div>
+      </header>
+
+      <main style={{maxWidth:1240,margin:'0 auto',padding:'48px 32px 64px'}}>
+        <div style={{maxWidth:720,marginBottom:40}}>
+          <p style={{...EYEBROW,color:C.marine,fontSize:12,marginBottom:12}}>Customer Enablement</p>
+          <h1 style={{fontSize:44,lineHeight:1.05,letterSpacing:'-0.02em',fontWeight:800,color:C.ink,margin:'0 0 16px'}}>From idea to impact.</h1>
+          <p style={{fontSize:18,lineHeight:1.55,color:C.body,margin:0}}>Every AI innovation the team is building, deploying, and refining — tracked in one place. Speed, clarity, and control across the pipeline.</p>
+        </div>
+
+        <section style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:16,marginBottom:16}}>
+          {statCard('Approved',totalCompleted,'completed innovations',()=>setModal({kind:'approved'}),true)}
+          {statCard('In progress',inProgressCount,'actively underway',()=>setModal({kind:'kpi',which:'inprogress'}),false)}
+          {statCard('Pipeline',pipelineCount,'not yet started',()=>setModal({kind:'kpi',which:'pipeline'}),false)}
+          {statCard('This sprint',sprintItems.length,'in active development',null,false)}
+        </section>
+
+        <section style={{...CARD,padding:'28px 32px',marginBottom:16}}>
+          <div style={{display:'flex',alignItems:'baseline',justifyContent:'space-between',gap:16,marginBottom:20,flexWrap:'wrap'}}>
+            <div>
+              <p style={{...EYEBROW,color:C.marine,marginBottom:4}}>Portfolio</p>
+              <h2 style={{fontSize:22,fontWeight:700,color:C.ink,margin:0,letterSpacing:'-0.01em'}}>Innovations by Solution Type</h2>
+            </div>
+            <span style={{fontSize:13,color:C.muted}}>{totalCompleted} total approved</span>
+          </div>
+          <div style={{display:'flex',height:14,borderRadius:999,overflow:'hidden',gap:2,marginBottom:22}}>
+            {typeSegments.map((s,i)=><div key={i} title={s.type} style={{height:'100%',background:s.color,width:s.width+'%'}}/>)}
+          </div>
+          <div style={{display:'flex',flexWrap:'wrap',gap:10}}>
+            {typeSegments.map((s,i)=>(
+              <button key={i} className="chip" onClick={()=>setModal({kind:'type',type:s.type})} style={{display:'inline-flex',alignItems:'center',gap:8,background:'#fff',border:'1px solid '+C.border,padding:'7px 8px 7px 12px',borderRadius:999,cursor:'pointer',font:'inherit'}}>
+                <span style={{width:10,height:10,borderRadius:3,background:s.color,flexShrink:0}}/>
+                <span style={{fontSize:13,fontWeight:600,color:C.body}}>{s.type}</span>
+                <span style={{fontSize:12,fontWeight:800,color:C.ink,background:C.hairline,borderRadius:999,padding:'1px 8px'}}>{s.count}</span>
+              </button>))}
+          </div>
+        </section>
+
+        <section style={{margin:'40px 0 16px'}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:16,marginBottom:20,flexWrap:'wrap'}}>
+            <div>
+              <p style={{...EYEBROW,color:C.marine,marginBottom:4}}>Now</p>
+              <h2 style={{fontSize:22,fontWeight:700,color:C.ink,margin:0,letterSpacing:'-0.01em'}}>Current Sprint <span style={{fontSize:15,fontWeight:600,color:C.faint}}>({sprintItems.length})</span></h2>
+            </div>
+            <div style={{position:'relative',display:'flex',alignItems:'center',gap:6,background:'#fff',border:'1px solid '+C.border,borderRadius:999,padding:'7px 12px 7px 14px'}}>
+              <Calendar size={14} style={{color:C.marine}}/>
+              <select value={activeSprintFilter} onChange={e=>setSelectedSprintFilter(e.target.value)} disabled={!availableSprints.length} style={{appearance:'none',WebkitAppearance:'none',border:0,background:'transparent',font:'inherit',fontSize:13,fontWeight:600,color:C.ink,cursor:'pointer',paddingRight:18,outline:'none'}}>
+                {availableSprints.length===0?<option>No sprints</option>:availableSprints.map(s=><option key={s} value={s}>{s}</option>)}
+              </select>
+              <ChevronDown size={14} style={{color:C.marine,position:'absolute',right:12,pointerEvents:'none'}}/>
+            </div>
+          </div>
+          {sprintItems.length===0 ? <div style={{...CARD,padding:24,textAlign:'center',fontSize:14,color:C.muted}}>No projects assigned to {activeSprintFilter||'this sprint'}.</div> :
+            <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(260px,1fr))',gap:16}}>
+              {sprintItems.map((it,i)=>{const pl=pillFor(it.progress);return (
+                <button key={i} className="card-hover" onClick={()=>setModal({kind:'sprint',item:it})} style={{textAlign:'left',font:'inherit',...CARD,borderRadius:14,padding:20,display:'flex',flexDirection:'column',gap:14,cursor:'pointer'}}>
+                  <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8}}>
+                    <span style={{fontSize:10,fontWeight:700,letterSpacing:'.06em',textTransform:'uppercase',padding:'4px 10px',borderRadius:999,background:pl.bg,color:pl.color}}>{it.progress||'—'}</span>
+                    <span style={{fontSize:15,fontWeight:800,color:C.ink}}>{it.percent}%</span>
+                  </div>
+                  <h3 className="clamp2" style={{fontSize:15,fontWeight:700,color:C.ink,lineHeight:1.35,margin:0,minHeight:40}}>{it.title}</h3>
+                  <Bar pct={it.percent}/>
+                  <Avatars expert={it.expert}/>
+                </button>);})}
+            </div>}
+        </section>
+
+        <section style={{...CARD,overflow:'hidden',marginTop:40}}>
+          <div style={{padding:'24px 28px',borderBottom:'1px solid '+C.border,display:'flex',alignItems:'center',justifyContent:'space-between',gap:16,flexWrap:'wrap'}}>
+            <div>
+              <p style={{...EYEBROW,color:C.marine,marginBottom:4}}>Portfolio</p>
+              <h2 style={{fontSize:22,fontWeight:700,color:C.ink,margin:0,letterSpacing:'-0.01em'}}>All Active Projects <span style={{fontSize:15,fontWeight:600,color:C.faint}}>{q&&filteredActive.length!==allActiveCount?filteredActive.length+' of '+allActiveCount:allActiveCount}</span></h2>
+            </div>
+            <div style={{position:'relative',width:300,maxWidth:'100%'}}>
+              <Search size={16} style={{position:'absolute',left:12,top:'50%',transform:'translateY(-50%)',color:C.faint,pointerEvents:'none'}}/>
+              <input type="text" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search title, expert, or status…" style={{width:'100%',padding:'10px 34px 10px 38px',fontSize:14,fontFamily:'inherit',color:C.ink,background:C.bg,border:'1px solid '+C.border,borderRadius:8}}/>
+              {query&&<button className="iconbtn" onClick={()=>setQuery('')} aria-label="Clear" style={{position:'absolute',right:8,top:'50%',transform:'translateY(-50%)',background:'none',border:0,cursor:'pointer',color:C.faint,borderRadius:6,padding:2,display:'flex'}}><X size={16}/></button>}
+            </div>
+          </div>
+          {filteredActive.length===0 ? <div style={{padding:40,textAlign:'center',color:C.faint,fontSize:14}}>{q?'No projects match "'+query+'".':'No active projects.'}</div> :
+            <div style={{overflowX:'auto'}}>
+              <table style={{width:'100%',borderCollapse:'collapse',fontSize:14}}>
+                <thead><tr style={{background:C.bg,borderBottom:'1px solid '+C.border}}>
+                  {[['Project','title'],['Innovation Expert','expert'],['Status','progress'],['Completion','percent']].map(([l,k],i)=>(
+                    <th key={k} style={{textAlign:'left',padding:i===1||i===2?'14px 20px':'14px 24px',minWidth:k==='percent'?150:'auto'}}>
+                      <button onClick={()=>handleSort(k)} style={{background:'none',border:0,font:'inherit',...EYEBROW,color:C.muted,cursor:'pointer',display:'inline-flex',alignItems:'center',gap:5}}>{l} <SortIcon k={k}/></button>
+                    </th>))}
+                </tr></thead>
+                <tbody>{filteredActive.map((it,i)=>{const pl=pillFor(it.progress);return (
+                  <tr key={i} className="trow" style={{borderBottom:'1px solid '+C.hairline}}>
+                    <td style={{padding:'16px 24px',fontWeight:600,color:C.ink,maxWidth:320}}>{it.title}</td>
+                    <td style={{padding:'16px 20px',color:C.body}}>{expertLabelOf(peopleOf(it.expert))}</td>
+                    <td style={{padding:'16px 20px'}}><span style={{display:'inline-block',fontSize:11,fontWeight:700,letterSpacing:'.04em',textTransform:'uppercase',padding:'4px 10px',borderRadius:999,background:pl.bg,color:pl.color,whiteSpace:'nowrap'}}>{it.progress||'—'}</span></td>
+                    <td style={{padding:'16px 24px'}}><div style={{display:'flex',alignItems:'center',gap:12}}><div style={{flex:1,minWidth:70}}><Bar pct={it.percent}/></div><span style={{fontSize:13,fontWeight:700,color:C.ink,width:38,textAlign:'right'}}>{it.percent}%</span></div></td>
+                  </tr>);})}</tbody>
+              </table>
+            </div>}
+        </section>
+
+        <p style={{textAlign:'center',fontSize:12,color:C.faint,margin:'32px 0 0'}}>Data sourced from Approved Innovations, Prompt Library, Share Your Project, and Work Items.</p>
+      </main>
+
+      <footer style={{background:C.marine,padding:'36px 32px',textAlign:'center'}}>
+        <p style={{fontSize:13,fontWeight:700,letterSpacing:'.16em',textTransform:'uppercase',color:'#fff',margin:'0 0 8px'}}>Deltek</p>
+        <p style={{fontSize:13,color:'rgba(255,255,255,.78)',margin:'0 auto',maxWidth:560}}>Customer Enablement Innovation Center — speed, clarity, and control across the project lifecycle.</p>
+      </footer>
+
+      {renderModal()}
+    </div>
+  );
+};
+
+createRoot(document.getElementById('root')).render(<Dashboard />);
+</script>
+</body>
+</html>
